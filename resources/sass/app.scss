@@ -7,16 +7,31 @@
 // Bootstrap
 @import '~bootstrap/scss/bootstrap';
 
+body {
+    display: flex;
+    width: 100vw;
+    height: 100vh
+}
+
+#app {
+    display: flex;
+    width: 100%
+}
+
 .mainContainer {
     color: rgb(44, 44, 44);
+    display: flex;
+    flex-direction: column;
+    width: 100%;
 }
 
 .topbar {
-    padding-left: 15px;
+    padding: 10px 20px 10px;
     background-color: #398874;
+    color: #303030
 }
 
-.topbar h3 {
+.topbar h4 {
     margin: 0 0;
 }
 
@@ -26,38 +41,57 @@
     justify-content: flex-start;
     align-items: flex-start;
     background-color: #44a28b;
+    overflow-x: auto;
+    height: 100%;
+    padding: 10px;
 }
 
 .list {
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
-    align-items: flex-start;
     width: 230px;
     margin: 10px 4px;
     padding: 10px 10px 5px;
     border-radius: 2px;
     background-color: #dcdcdc;
+    // overflow-y: auto;
+    // max-height: 85vh;
 }
 
 .list-header {
     background-color: #dcdcdc;
+    margin-bottom: 5px;
+    min-width: 0;
+
 }
 
 .list-header h6 {
     margin: 0;
     padding: 0 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 165px;
+}
+
+.cardList {
+    max-height: 85vh;
+    overflow-y: auto;
 }
 
 .my-card {
     color: rgb(48, 48, 48);
     width: 100%;
-    padding: 5px 5px;
+    padding: 5px 8px;
     background-color: #f6f6f6;
     border-radius: 4px;
-    margin: 5px 0px;
+    margin: 8px 0px;
 }
 
 .my-card p {
     margin: 0 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 165px;
 }

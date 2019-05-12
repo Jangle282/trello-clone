@@ -1,8 +1,10 @@
  <template>
-  <div class="mainContainer">
+  <div>
     <TopBar/>
-    <div class="board">
-      <List v-bind:cards="cards" v-for="list in this.lists" :key="list.id" v-bind:slist="list"/>
+    <div class="mainContainer">
+      <div class="board">
+        <List v-bind:cards="cards" v-for="list in this.lists" :key="list.id" v-bind:slist="list"/>
+      </div>
     </div>
   </div>
 </template>
@@ -29,22 +31,26 @@ export default {
     };
   },
 
-  method: {},
+  methods: {
+    getCards() {
+      axios.get("/cards").then(response => {
+        this.cards = response.data;
+      });
+    },
+    getLists() {
+      axios.get("/slists").then(response => {
+        this.lists = response.data;
+      });
+    }
+  },
 
   computed: {},
 
-  mounted() {
-    console.log("Mounted", this.lists, this.cards);
-  },
+  mounted() {},
 
   created() {
-    window.axios.get("/slists").then(response => {
-      this.lists = response.data;
-    });
-    window.axios.get("/cards").then(response => {
-      this.cards = response.data;
-      console.log("cards be here", this.cards);
-    });
+    this.getCards();
+    this.getLists();
   }
 };
 

@@ -3,7 +3,9 @@
     <div class="list-header">
       <h6>{{slist.name || "add a list"}}</h6>
     </div>
-    <Card v-for="card in filteredCards" :key="card.id" v-bind:card="card"/>
+    <div class="cardList">
+      <Card v-for="card in filteredCards" :key="card.id" v-bind:card="card"/>
+    </div>
   </div>
 </template>
 
@@ -24,14 +26,37 @@ export default {
 
   data() {
     return {
-      filteredCards: Array
+      filteredCards: [
+        {
+          name: "",
+          id: 0,
+          description: "",
+          _list_id: 0
+        }
+      ]
     };
   },
 
+  watch: {
+    cards() {
+      this.filterCards();
+    }
+  },
+
+  methods: {
+    filterCards() {
+      this.filteredCards = this.cards.filter(card => {
+        return card._list_id === this.$props.slist.id;
+      });
+    }
+  },
+
+  mounted() {},
+
+  // watch the cards prop and call a method to filter them and set filtered cards
+  // create a default thing to load if there isn't anything in the data yet
   created() {
-    this.filteredCards = this.cards.filter(card => {
-      return card._list_id === this.$props.slist.id;
-    });
+    if (this.cards) this.filterCards();
   }
 };
 </script>
