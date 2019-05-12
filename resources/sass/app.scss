@@ -1,0 +1,63 @@
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+.mainContainer {
+    color: rgb(44, 44, 44);
+}
+
+.topbar {
+    padding-left: 15px;
+    background-color: #398874;
+}
+
+.topbar h3 {
+    margin: 0 0;
+}
+
+.board {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    background-color: #44a28b;
+}
+
+.list {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: 230px;
+    margin: 10px 4px;
+    padding: 10px 10px 5px;
+    border-radius: 2px;
+    background-color: #dcdcdc;
+}
+
+.list-header {
+    background-color: #dcdcdc;
+}
+
+.list-header h6 {
+    margin: 0;
+    padding: 0 5px;
+}
+
+.my-card {
+    color: rgb(48, 48, 48);
+    width: 100%;
+    padding: 5px 5px;
+    background-color: #f6f6f6;
+    border-radius: 4px;
+    margin: 5px 0px;
+}
+
+.my-card p {
+    margin: 0 0;
+}
