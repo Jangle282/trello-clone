@@ -3,7 +3,14 @@
     <TopBar/>
     <div class="mainContainer">
       <div class="board">
-        <List v-bind:cards="cards" v-for="list in this.lists" :key="list.id" v-bind:slist="list"/>
+        <List
+          v-for="list in this.lists"
+          :key="list.id"
+          v-bind:cards="cards"
+          v-bind:listIdforopenAddCard="listIdforopenAddCard"
+          v-bind:slist="list"
+          v-on:toggleAddCards="toggleAddCards"
+        />
       </div>
     </div>
   </div>
@@ -27,7 +34,8 @@ export default {
   data() {
     return {
       lists: null,
-      cards: null
+      cards: null,
+      listIdforopenAddCard: Number
     };
   },
 
@@ -41,6 +49,9 @@ export default {
       axios.get("/slists").then(response => {
         this.lists = response.data;
       });
+    },
+    toggleAddCards(listId) {
+      this.listIdforopenAddCard = listId;
     }
   },
 

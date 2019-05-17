@@ -25,7 +25,7 @@ class CardController extends Controller
      */
     public function create()
     {
-        //
+        // dd("hello from create card function", request());
     }
 
     /**

@@ -6,6 +6,19 @@
     <div class="cardList">
       <Card v-for="card in filteredCards" :key="card.id" v-bind:card="card"/>
     </div>
+
+    <div v-if="listIdforopenAddCard === slist.id" class="addCardForm">
+      <form action>
+        <input type="text" name id>
+        <button>Add</button>
+      </form>
+      <button>X</button>
+      <button>...</button>
+    </div>
+
+    <div v-else class="cardList">
+      <p v-on:click.prevent="$emit('toggleAddCards', slist.id)">Add a Card</p>
+    </div>
   </div>
 </template>
 
@@ -21,6 +34,7 @@ export default {
       name: String,
       id: Number
     },
+    listIdforopenAddCard: Number,
     cards: Array
   },
 
@@ -53,8 +67,6 @@ export default {
 
   mounted() {},
 
-  // watch the cards prop and call a method to filter them and set filtered cards
-  // create a default thing to load if there isn't anything in the data yet
   created() {
     if (this.cards) this.filterCards();
   }

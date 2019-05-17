@@ -1820,6 +1820,19 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "List",
@@ -1831,6 +1844,7 @@ __webpack_require__.r(__webpack_exports__);
       name: String,
       id: Number
     },
+    listIdforopenAddCard: Number,
     cards: Array
   },
   data: function data() {
@@ -1858,8 +1872,6 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   mounted: function mounted() {},
-  // watch the cards prop and call a method to filter them and set filtered cards
-  // create a default thing to load if there isn't anything in the data yet
   created: function created() {
     if (this.cards) this.filterCards();
   }
@@ -1912,6 +1924,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -1925,7 +1944,8 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       lists: null,
-      cards: null
+      cards: null,
+      listIdforopenAddCard: Number
     };
   },
   methods: {
@@ -1942,6 +1962,9 @@ __webpack_require__.r(__webpack_exports__);
       axios.get("/slists").then(function (response) {
         _this2.lists = response.data;
       });
+    },
+    toggleAddCards: function toggleAddCards(listId) {
+      this.listIdforopenAddCard = listId;
     }
   },
   computed: {},
@@ -37978,10 +38001,44 @@ var render = function() {
         return _c("Card", { key: card.id, attrs: { card: card } })
       }),
       1
-    )
+    ),
+    _vm._v(" "),
+    _vm.listIdforopenAddCard === _vm.slist.id
+      ? _c("div", { staticClass: "addCardForm" }, [
+          _vm._m(0),
+          _vm._v(" "),
+          _c("button", [_vm._v("X")]),
+          _vm._v(" "),
+          _c("button", [_vm._v("...")])
+        ])
+      : _c("div", { staticClass: "cardList" }, [
+          _c(
+            "p",
+            {
+              on: {
+                click: function($event) {
+                  $event.preventDefault()
+                  return _vm.$emit("toggleAddCards", _vm.slist.id)
+                }
+              }
+            },
+            [_vm._v("Add a Card")]
+          )
+        ])
   ])
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("form", { attrs: { action: "" } }, [
+      _c("input", { attrs: { type: "text", name: "", id: "" } }),
+      _vm._v(" "),
+      _c("button", [_vm._v("Add")])
+    ])
+  }
+]
 render._withStripped = true
 
 
@@ -38048,7 +38105,12 @@ var render = function() {
           _vm._l(this.lists, function(list) {
             return _c("List", {
               key: list.id,
-              attrs: { cards: _vm.cards, slist: list }
+              attrs: {
+                cards: _vm.cards,
+                listIdforopenAddCard: _vm.listIdforopenAddCard,
+                slist: list
+              },
+              on: { toggleAddCards: _vm.toggleAddCards }
             })
           }),
           1
