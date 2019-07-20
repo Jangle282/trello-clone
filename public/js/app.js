@@ -1830,9 +1830,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "List",
@@ -1849,12 +1846,20 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
-      filteredCards: [{
+      filteredCards: function filteredCards() {
+        return;
+        [{
+          name: "",
+          id: 0,
+          description: "",
+          _list_id: 0
+        }];
+      },
+      newCardData: {
         name: "",
-        id: 0,
-        description: "",
-        _list_id: 0
-      }]
+        _list_id: this.slist.id,
+        description: ""
+      }
     };
   },
   watch: {
@@ -1869,9 +1874,41 @@ __webpack_require__.r(__webpack_exports__);
       this.filteredCards = this.cards.filter(function (card) {
         return card._list_id === _this.$props.slist.id;
       });
+    },
+    submitAddCard: function submitAddCard(data) {
+      var _this2 = this;
+
+      // clear the input in the add form
+      // change so not another call to retrieve all cards rather adding new card to main array.
+      // do same thing with lists so can see new ones added
+      // try and add a list and then cards to that list
+      // also remake add caard form so it isn't a form
+      // scroll to bottom of list on adding a new card so can see what as just added
+      // add new card on hitting return
+      // when adding a new card it was taking too long for the new card to appear on the board
+      // because had to retrieve all teh cards again
+      // solution was to push it to the arrya straight away and
+      // then do the callasynchronously to refresh all the cards
+      // it still takes too long to clear the input form on clicking add
+      // ... I want it to be like real trello where it is instantaneously added
+      // and there is no waiting around for it to happen
+      // maybe this is why you use Vuex
+      axios.post("/cards", this.newCardData).then(function (response) {
+        _this2.$emit("newCardCreated", _this2.newCardData);
+
+        _this2.resetAddCardValues();
+      })["catch"](function (error) {
+        console.log("error submitting add new list form", error);
+      });
+    },
+    resetAddCardValues: function resetAddCardValues() {
+      this.newCardData = {
+        name: "",
+        description: "",
+        _list_id: this.slist.id
+      };
     }
   },
-  mounted: function mounted() {},
   created: function created() {
     if (this.cards) this.filterCards();
   }
@@ -1931,6 +1968,18 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -1945,7 +1994,11 @@ __webpack_require__.r(__webpack_exports__);
     return {
       lists: null,
       cards: null,
-      listIdforopenAddCard: Number
+      listIdforopenAddCard: null,
+      listFormOpen: false,
+      newListData: {
+        name: ""
+      }
     };
   },
   methods: {
@@ -1965,10 +2018,29 @@ __webpack_require__.r(__webpack_exports__);
     },
     toggleAddCards: function toggleAddCards(listId) {
       this.listIdforopenAddCard = listId;
+    },
+    toggleListForm: function toggleListForm() {
+      this.listFormOpen = !this.listFormOpen;
+    },
+    fireCreateSlist: function fireCreateSlist() {
+      var _this3 = this;
+
+      axios.post("/slists", this.newListData).then(function (response) {
+        _this3.lists.push(_this3.newListData);
+
+        _this3.newListData.name = "";
+
+        _this3.getLists();
+      })["catch"](function (error) {
+        console.log("error in when creating new list: ", error);
+      });
+      this.listFormOpen = false;
+    },
+    newCard: function newCard(newCardData) {
+      this.cards.push(newCardData);
+      this.getCards();
     }
   },
-  computed: {},
-  mounted: function mounted() {},
   created: function created() {
     this.getCards();
     this.getLists();
@@ -37997,48 +38069,75 @@ var render = function() {
     _c(
       "div",
       { staticClass: "cardList" },
-      _vm._l(_vm.filteredCards, function(card) {
-        return _c("Card", { key: card.id, attrs: { card: card } })
-      }),
-      1
-    ),
-    _vm._v(" "),
-    _vm.listIdforopenAddCard === _vm.slist.id
-      ? _c("div", { staticClass: "addCardForm" }, [
-          _vm._m(0),
-          _vm._v(" "),
-          _c("button", [_vm._v("X")]),
-          _vm._v(" "),
-          _c("button", [_vm._v("...")])
-        ])
-      : _c("div", { staticClass: "cardList" }, [
-          _c(
-            "p",
-            {
-              on: {
-                click: function($event) {
-                  $event.preventDefault()
-                  return _vm.$emit("toggleAddCards", _vm.slist.id)
+      [
+        _vm._l(_vm.filteredCards, function(card) {
+          return _c("Card", { key: card.id, attrs: { card: card } })
+        }),
+        _vm._v(" "),
+        _vm.listIdforopenAddCard === _vm.slist.id
+          ? _c("div", { staticClass: "addCardForm" }, [
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.newCardData.name,
+                    expression: "newCardData.name"
+                  }
+                ],
+                attrs: { type: "text", name: "title", id: "title" },
+                domProps: { value: _vm.newCardData.name },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(_vm.newCardData, "name", $event.target.value)
+                  }
                 }
-              }
-            },
-            [_vm._v("Add a Card")]
-          )
-        ])
+              }),
+              _vm._v(" "),
+              _c(
+                "div",
+                { attrs: { type: "submit" }, on: { click: _vm.submitAddCard } },
+                [_vm._v("Add")]
+              ),
+              _vm._v(" "),
+              _c(
+                "button",
+                {
+                  on: {
+                    click: function($event) {
+                      $event.preventDefault()
+                      return _vm.$emit("toggleAddCards", null)
+                    }
+                  }
+                },
+                [_vm._v("X")]
+              ),
+              _vm._v(" "),
+              _c("button", [_vm._v("...")])
+            ])
+          : _c("div", { staticClass: "cardList" }, [
+              _c(
+                "p",
+                {
+                  on: {
+                    click: function($event) {
+                      $event.preventDefault()
+                      return _vm.$emit("toggleAddCards", _vm.slist.id)
+                    }
+                  }
+                },
+                [_vm._v("Add a Card")]
+              )
+            ])
+      ],
+      2
+    )
   ])
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("form", { attrs: { action: "" } }, [
-      _c("input", { attrs: { type: "text", name: "", id: "" } }),
-      _vm._v(" "),
-      _c("button", [_vm._v("Add")])
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 
@@ -38102,18 +38201,62 @@ var render = function() {
         _c(
           "div",
           { staticClass: "board" },
-          _vm._l(this.lists, function(list) {
-            return _c("List", {
-              key: list.id,
-              attrs: {
-                cards: _vm.cards,
-                listIdforopenAddCard: _vm.listIdforopenAddCard,
-                slist: list
-              },
-              on: { toggleAddCards: _vm.toggleAddCards }
-            })
-          }),
-          1
+          [
+            _vm._l(this.lists, function(list) {
+              return _c("List", {
+                key: list.id,
+                attrs: {
+                  cards: _vm.cards,
+                  listIdforopenAddCard: _vm.listIdforopenAddCard,
+                  slist: list
+                },
+                on: {
+                  toggleAddCards: _vm.toggleAddCards,
+                  newCardCreated: _vm.newCard
+                }
+              })
+            }),
+            _vm._v(" "),
+            _c("div", { staticClass: "list" }, [
+              _vm.listFormOpen
+                ? _c("div", { staticClass: "addListForm" }, [
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.newListData.name,
+                          expression: "newListData.name"
+                        }
+                      ],
+                      attrs: { type: "text", name: "title", id: "title" },
+                      domProps: { value: _vm.newListData.name },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(_vm.newListData, "name", $event.target.value)
+                        }
+                      }
+                    }),
+                    _vm._v(" "),
+                    _c("button", { on: { click: _vm.fireCreateSlist } }, [
+                      _vm._v("Add")
+                    ]),
+                    _vm._v(" "),
+                    _c("button", { on: { click: _vm.toggleListForm } }, [
+                      _vm._v("X")
+                    ])
+                  ])
+                : _c("div", { staticClass: "addList" }, [
+                    _c("p", { on: { click: _vm.toggleListForm } }, [
+                      _vm._v("Add a List")
+                    ])
+                  ])
+            ])
+          ],
+          2
         )
       ])
     ],

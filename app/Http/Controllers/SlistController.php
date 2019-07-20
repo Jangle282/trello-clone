@@ -23,7 +23,7 @@ class SlistController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
         //
     }
@@ -36,7 +36,13 @@ class SlistController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $slist = new Slist();
+
+        $slist->name = request('name');
+
+        $slist->save();
+
+        return response($slist, Response::HTTP_OK);
     }
 
     /**

@@ -36,7 +36,30 @@ class CardController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
+        // return Response::HTTP_OK;
+        // Card::create($request->all());
+
+        $card = new Card();
+
+        $card->name = request('name');
+        $card->_list_id = request('_list_id');
+        $card->description = request('description');
+
+        $card->save();
+
+        return Response::HTTP_OK;
+        // return redirect('/');
+
+        // // LONGER BUT MORE EXPLANATORY WAY TO SAVE NEW PREOJCT
+        // // create a new project from eloquent model and save to a variable
+        // $project = new Project();
+        // // save information sent with the request from teh post form tothe new project
+        // $project->title = request('title');
+        // $project->description = request('description');
+        // // save the project to the database
+        // $project->save();
+        // // redirect back to the  projects page
     }
 
     /**
