@@ -87,6 +87,8 @@ class SlistController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $slist = Slist::find($id);
+        $slist->delete();
+        return response(Response::HTTP_OK);
     }
 }

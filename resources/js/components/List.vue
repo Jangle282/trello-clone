@@ -1,10 +1,22 @@
 <template>
   <div class="list">
-    <div class="list-header">
+    <div @mouseover="showEllipses" @mouseleave="hideEllipses" class="list-header">
       <h6>{{slist.name || "add a list"}}</h6>
+      <div v-if="ellipses" class="ellipses" @click="toggleOpenListMenu">...</div>
+      <div v-if="openListMenu" class>
+        <div class="open-list-menu">
+          <div @click="confirmDeleteListMessage" class="open-card-list-item">delete</div>
+          <div class="open-card-list-item">edit</div>
+        </div>
+      </div>
     </div>
     <div class="cardList">
-      <Card v-for="card in filteredCards" :key="card.id" v-bind:card="card" />
+      <Card
+        v-for="card in filteredCards"
+        :key="card.id"
+        v-bind:card="card"
+        @cardDeleted="confirmDeleteCardMessage"
+      />
 
       <div v-if="listIdforopenAddCard === slist.id" class="addCardForm">
         <input v-model="newCardData.name" type="text" name="title" id="title" />
@@ -52,7 +64,9 @@ export default {
         name: "",
         _list_id: this.slist.id,
         description: ""
-      }
+      },
+      ellipses: false,
+      openListMenu: false
     };
   },
 
@@ -69,30 +83,15 @@ export default {
       });
     },
 
-    submitAddCard(data) {
-      // clear the input in the add form
-      // change so not another call to retrieve all cards rather adding new card to main array.
-      // do same thing with lists so can see new ones added
-      // try and add a list and then cards to that list
-      // also remake add caard form so it isn't a form
-      // scroll to bottom of list on adding a new card so can see what as just added
-      // add new card on hitting return
-      // when adding a new card it was taking too long for the new card to appear on the board
-      // because had to retrieve all teh cards again
-      // solution was to push it to the arrya straight away and
-      // then do the callasynchronously to refresh all the cards
-      // it still takes too long to clear the input form on clicking add
-      // ... I want it to be like real trello where it is instantaneously added
-      // and there is no waiting around for it to happen
-      // maybe this is why you use Vuex
+    submitAddCard() {
+      var newCard = this.newCardData;
+      this.resetAddCardValues();
+      this.$emit("newCardCreated", newCard);
       axios
-        .post("/cards", this.newCardData)
-        .then(response => {
-          this.$emit("newCardCreated", this.newCardData);
-          this.resetAddCardValues();
-        })
+        .post("/cards", newCard)
+        .then(response => {})
         .catch(error => {
-          console.log("error submitting add new list form", error);
+          console.log("error submitting add new list form");
         });
     },
 
@@ -102,6 +101,51 @@ export default {
         description: "",
         _list_id: this.slist.id
       };
+    },
+
+    confirmDeleteCardMessage(data) {
+      if (confirm("Are you sure you want to delete this card?")) {
+        this.deleteCard(data);
+      }
+    },
+
+    confirmDeleteListMessage() {
+      if (confirm("Are you sure you want to delete this list?")) {
+        this.deleteSlist();
+      }
+    },
+
+    deleteCard(data) {
+      this.$emit("cardDeleted", data);
+      axios
+        .post(`/cards/${data.id}`)
+        .then(() => {})
+        .catch(err => {
+          console.log("error deleting card");
+        });
+    },
+
+    deleteSlist() {
+      const listId = this.slist.id;
+      this.$emit("listDeleted", listId);
+      axios
+        .post(`/slists/${listId}`)
+        .then(response => {})
+        .catch(err => {
+          console.log("error deleting list");
+        });
+    },
+
+    toggleOpenListMenu() {
+      this.openListMenu = !this.openListMenu;
+    },
+
+    showEllipses() {
+      this.ellipses = true;
+    },
+
+    hideEllipses() {
+      this.ellipses = false;
     }
   },
 

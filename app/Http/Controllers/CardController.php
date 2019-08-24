@@ -104,6 +104,8 @@ class CardController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $card = Card::find($id);
+        $card->delete();
+        return response(Response::HTTP_OK);
     }
 }

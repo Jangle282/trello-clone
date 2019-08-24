@@ -64,6 +64,12 @@ body {
     margin-bottom: 5px;
     min-width: 0;
 
+    .ellipses {
+        margin: 0 0;
+        width: 10%;
+        display: inline-block;
+        cursor: pointer;
+    }
 }
 
 .list-header h6 {
@@ -80,18 +86,46 @@ body {
     overflow-y: auto;
 }
 
-.my-card {
+.task-card {
     color: rgb(48, 48, 48);
     width: 100%;
     padding: 5px 8px;
     background-color: #f6f6f6;
     border-radius: 4px;
     margin: 8px 0px;
+
+    .card-name {
+        margin: 0 0;
+        width: 85%;
+        display: inline-block
+    }
+
+    .ellipses {
+        margin: 0 0;
+        width: 10%;
+        display: inline-block;
+        cursor: pointer;
+    }
 }
 
-.my-card p {
-    margin: 0 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 165px;
+.open-card-menu {
+    border: 1px solid black;
+    // these things make a full screen overlay
+    // within that overlay 
+    // width: 100vw;
+    // height: 100vh;
+    // position: fixed;
+    // top: 0;
+    // right: 0;
+}
+
+.open-list-menu {
+    border: 1px solid black;
+    // these things make a full screen overlay
+    // within that overlay 
+    // width: 100vw;
+    // height: 100vh;
+    // position: fixed;
+    // top: 0;
+    // right: 0;
 }

@@ -11,6 +11,8 @@
           v-bind:slist="list"
           v-on:toggleAddCards="toggleAddCards"
           @newCardCreated="newCard"
+          @cardDeleted="deleteCard"
+          @listDeleted="deleteList"
         />
 
         <div class="list">
@@ -77,22 +79,41 @@ export default {
     },
 
     fireCreateSlist() {
+      const newList = this.newListData;
+      this.lists.push(newList);
+      this.clearAddListForm();
       axios
-        .post("/slists", this.newListData)
+        .post("/slists", newList)
         .then(response => {
-          this.lists.push(this.newListData);
-          this.newListData.name = "";
           this.getLists();
         })
         .catch(error => {
-          console.log("error in when creating new list: ", error);
+          console.log("error in when creating new list");
         });
       this.listFormOpen = false;
     },
 
     newCard(newCardData) {
       this.cards.push(newCardData);
-      this.getCards();
+      // this.getCards();
+    },
+
+    clearAddListForm() {
+      this.newListData = {
+        name: ""
+      };
+    },
+
+    deleteCard(data) {
+      this.cards = this.cards.filter(card => {
+        return card.id !== data.id;
+      });
+    },
+
+    deleteList(listId) {
+      this.lists = this.lists.filter(list => {
+        return list.id !== listId;
+      });
     }
   },
 
@@ -101,19 +122,6 @@ export default {
     this.getLists();
   }
 };
-
-//   in the controller - communicate with the databse - receive data objects the return a response after succeeding
-//   user interactions for CRUD operations trigger emit events - passlisteners @listenername as prop down to child
-//      emit the name of the listener fromt eh user interaction
-//      listener triggers methods in teh main component
-//      then use axios to make the AJAX calls (which go to the router then the controllers)
-//        e.g. window.axios.get/post/deleteetc('list/delete').then(save the response to something or feedback success)
-//
-//
-// create scroll boars
-// wrap text on the list and card titles
-// set up a dragging event and see if you can dynamically change the iD
-//
 </script>
 
 <style lang="scss" scss>

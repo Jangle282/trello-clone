@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\CardController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -15,7 +17,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Route::get('/slists', 'SlistController@index');
+Route::post('/cards/{id}', 'CardController@destroy');
+
+Route::post('/slists/{id}', 'SlistController@destroy');
 
 Route::resource('slists', "SlistController");
 
