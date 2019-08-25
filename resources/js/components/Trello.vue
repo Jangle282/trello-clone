@@ -13,6 +13,7 @@
           @newCardCreated="newCard"
           @cardDeleted="deleteCard"
           @listDeleted="deleteList"
+          @updateCards="getCards"
         />
 
         <div class="list">

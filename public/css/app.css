@@ -10739,6 +10739,11 @@ body {
   overflow-y: auto;
 }
 
+.dragged-card {
+  background-color: aliceblue;
+  color: gainsboro;
+}
+
 .task-card {
   color: #303030;
   width: 100%;

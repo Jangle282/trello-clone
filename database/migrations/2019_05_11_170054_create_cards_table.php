@@ -19,6 +19,7 @@ class CreateCardsTable extends Migration
             $table->string('name');
             $table->text('description')->nullable()->default(null);
             $table->unsignedInteger('_list_id');
+            $table->decimal('list_order', 10, 9);
         });
     }
 
