@@ -22,15 +22,23 @@
     </div>
 
     <div v-if="listIdforopenAddCard === slist.id" class="add-card-form">
-      <input v-model="newCardData.name" type="text" name="title" id="title" />
-      <div @click="submitAddCard" type="submit">Add</div>
-      <button @click.prevent="$emit('toggleAddCards', null)">X</button>
-      <button>...</button>
+      <input
+        v-model="newCardData.name"
+        type="text"
+        name="title"
+        id="title"
+        ref="cardTitle"
+        @keyup.enter="submitAddCard"
+      />
+      <div @click="submitAddCard">Add</div>
+      <div @click="$emit('toggleAddCards', null)">X</div>
+      <div>...</div>
     </div>
     <div
       v-else
       class="add-card-form"
       v-on:click.prevent="$emit('toggleAddCards', slist.id)"
+      @click="focusInput"
     >Add a Card</div>
   </div>
 </template>
@@ -151,8 +159,9 @@ export default {
     // AXIOS methods
     submitAddCard() {
       var newCard = this.newCardData;
-      newCard.list_order =
-        this.filteredCards[this.filteredCards.length - 1].list_order + 1;
+      newCard.list_order = this.filteredCards.length
+        ? this.filteredCards[this.filteredCards.length - 1].list_order + 1
+        : 1;
       this.resetAddCardValues();
       this.$emit("newCardCreated", newCard);
       axios
@@ -208,6 +217,12 @@ export default {
       if (confirm("Are you sure you want to delete this list?")) {
         this.deleteSlist();
       }
+    },
+
+    focusInput() {
+      this.$nextTick(() => {
+        this.$refs.cardTitle.focus();
+      });
     }
   }
 };

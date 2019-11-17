@@ -18,9 +18,16 @@
 
         <div class="list">
           <div v-if="listFormOpen" class="addListForm">
-            <input v-model="newListData.name" type="text" name="title" id="title" />
-            <button @click="fireCreateSlist">Add</button>
-            <button @click="toggleListForm">X</button>
+            <input
+              v-model="newListData.name"
+              type="text"
+              name="title"
+              id="title"
+              ref="listTitle"
+              @keyup.enter="fireCreateSlist"
+            />
+            <div @click="fireCreateSlist">Add</div>
+            <div @click="toggleListForm">X</div>
           </div>
           <div v-else class="addList">
             <p @click="toggleListForm">Add a List</p>
@@ -99,6 +106,9 @@ export default {
 
     toggleListForm() {
       this.listFormOpen = !this.listFormOpen;
+      this.$nextTick(() => {
+        this.$refs.listTitle.focus();
+      });
     },
 
     newCard(newCardData) {
