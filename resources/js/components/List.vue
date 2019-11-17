@@ -21,15 +21,17 @@
       />
     </div>
 
-    <div v-if="listIdforopenAddCard === slist.id" class="addCardForm">
+    <div v-if="listIdforopenAddCard === slist.id" class="add-card-form">
       <input v-model="newCardData.name" type="text" name="title" id="title" />
       <div @click="submitAddCard" type="submit">Add</div>
       <button @click.prevent="$emit('toggleAddCards', null)">X</button>
       <button>...</button>
     </div>
-    <div v-else class="cardList">
-      <p v-on:click.prevent="$emit('toggleAddCards', slist.id)">Add a Card</p>
-    </div>
+    <div
+      v-else
+      class="add-card-form"
+      v-on:click.prevent="$emit('toggleAddCards', slist.id)"
+    >Add a Card</div>
   </div>
 </template>
 
@@ -106,16 +108,13 @@ export default {
     },
 
     cardRemovedByDrag(cardId) {
-      console.log("cardRemovedByDrag: ");
       const cardIndex = this.filteredCards.findIndex(
         card => card.id === cardId
       );
-      console.log("card index", cardIndex);
       this.filteredCards.splice(cardIndex, 1);
     },
 
     fireUpdateCard(cardData) {
-      console.log("update card method");
       axios
         .put(`cards/${cardData.id}`, cardData)
         .then(response => {
@@ -136,13 +135,17 @@ export default {
 
     submitAddCard() {
       var newCard = this.newCardData;
+      newCard.list_order =
+        this.filteredCards[this.filteredCards.length - 1].list_order + 1;
       this.resetAddCardValues();
       this.$emit("newCardCreated", newCard);
       axios
         .post("/cards", newCard)
-        .then(response => {})
+        .then(response => {
+          this.$emit("updateCards");
+        })
         .catch(error => {
-          console.log("error submitting add new list form");
+          console.log("error submitting add new card form");
         });
     },
 

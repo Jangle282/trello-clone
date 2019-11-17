@@ -1,14 +1,14 @@
 <template>
-  <div :class="{'dragged-card' : cardIsDragged}">
+  <div class="card-container">
     <div
       draggable="true"
       @dragstart="cardDragStart"
       @dragend="cardDragEnded"
       @mouseover="showEllipses"
       @mouseleave="hideEllipses"
-      class="task-card"
+      :class="[{'dragged-card' : cardIsDragged}, 'task-card']"
     >
-      <p class="card-name">{{ card.name }}{{card.list_order}}</p>
+      <p class="card-name">{{ card.name }}</p>
       <div v-if="ellipses" class="ellipses" @click="toggleOpenCardMenu">...</div>
       <div v-if="openCardMenu">
         <div class="open-card-menu">
@@ -18,11 +18,12 @@
       </div>
     </div>
     <div
-      class="drag-zone"
+      :class="[{ 'expand-drag-zone' : expandDragZone}, 'drag-zone' ]"
       @dragenter="cardDragEnter"
       @dragover="cardDragOver"
+      @dragleave="cardDragLeave"
       @drop="cardDragDrop"
-    >drag zone {{card.id}}</div>
+    ></div>
   </div>
 </template>
 
@@ -36,22 +37,45 @@ export default {
     return {
       openCardMenu: false,
       ellipses: false,
-      cardIsDragged: false
+      cardIsDragged: false,
+      expandDragZone: false
     };
   },
+
+  mounted() {
+    this.setEventListeners();
+  },
+
   methods: {
+    setEventListeners() {
+      this.$on("draggedCardEnteredDragZone", this.expandDragZoneHeight);
+      this.$on("draggedCardLeftDragZone", this.collapseDragZoneHeight);
+    },
+
     toggleOpenCardMenu() {
       this.openCardMenu = !this.openCardMenu;
     },
+
+    expandDragZoneHeight() {
+      this.expandDragZone = true;
+    },
+
+    collapseDragZoneHeight() {
+      this.expandDragZone = false;
+    },
+
     showEllipses() {
       this.ellipses = true;
     },
+
     hideEllipses() {
       this.ellipses = false;
     },
+
     deleteCard() {
       this.$emit("cardDeleted", this.card);
     },
+
     cardDragStart(event) {
       const draggedCardId = this.card.id;
       const draggedCardListId = this.card._list_id;
@@ -61,17 +85,23 @@ export default {
       );
       event.dataTransfer.effectAllowed = "move";
       this.cardIsDragged = true;
-      console.log("drag started");
     },
+
     cardDragOver(event) {
       event.preventDefault();
       event.dataTransfer.dropEffect = "move";
-      // console.log("over dragzone");
     },
-    cardDragEnter(event) {
+
+    cardDragEnter() {
       event.preventDefault();
       event.dataTransfer.dropEffect = "move";
-      // console.log("enter dragzone");
+      this.$emit("draggedCardEnteredDragZone", this.card.id);
+    },
+
+    cardDragLeave() {
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "move";
+      this.$emit("draggedCardLeftDragZone");
     },
 
     cardDragDrop(event) {
@@ -87,11 +117,11 @@ export default {
         dropZoneListOrder: this.card.list_order
       };
       this.$emit("cardDropped", cardDragData);
+      this.$emit("draggedCardLeftDragZone");
     },
 
     cardDragEnded(event) {
       this.cardIsDragged = false;
-      console.log("drage end event: ", event.dataTransfer.dropEffect);
       if (event.dataTransfer.dropEffect !== "none") {
         this.$emit("removedDraggedCard", this.card.id);
       }

@@ -50,9 +50,9 @@ body {
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
-    width: 230px;
+    width: 250px;
     margin: 10px 4px;
-    padding: 10px 10px 5px;
+    padding: 10px 0 5px;
     border-radius: 2px;
     background-color: #dcdcdc;
     // overflow-y: auto;
@@ -63,6 +63,7 @@ body {
     background-color: #dcdcdc;
     margin-bottom: 5px;
     min-width: 0;
+    padding: 0 10px;
 
     .ellipses {
         margin: 0 0;
@@ -86,18 +87,20 @@ body {
     overflow-y: auto;
 }
 
-.dragged-card {
-    background-color: aliceblue;
-    color: gainsboro;
+.add-card-form {
+    padding: 5px 10px 5px 15px;
+}
+
+.card-container {
+    padding: 0 10px;
 }
 
 .task-card {
     color: rgb(48, 48, 48);
     width: 100%;
-    padding: 5px 8px;
+    padding: 0 8px;
     background-color: #f6f6f6;
     border-radius: 4px;
-    margin: 8px 0px;
 
     .card-name {
         margin: 0 0;
@@ -111,6 +114,11 @@ body {
         display: inline-block;
         cursor: pointer;
     }
+}
+
+.dragged-card {
+    background-color: rgb(48, 48, 48);
+    color: #f6f6f6;
 }
 
 .open-card-menu {
@@ -133,4 +141,12 @@ body {
     // position: fixed;
     // top: 0;
     // right: 0;
+}
+
+.drag-zone {
+    height: 15px;
+
+    &.expand-drag-zone {
+        height: 50px;
+    }
 }

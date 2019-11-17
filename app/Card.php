@@ -11,4 +11,9 @@ class Card extends Model
     protected $casts = [
         'list_order' => 'float',
     ];
+
+    public function Slist()
+    {
+        $this->belongsTo('Slist');
+    }
 }
