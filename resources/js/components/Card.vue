@@ -12,7 +12,7 @@
       <div v-if="ellipses" class="ellipses" @click="toggleOpenCardMenu">...</div>
       <div v-if="openCardMenu">
         <div class="open-card-menu">
-          <div @click="deleteCard" class="open-card-menu-item">delete</div>
+          <div @click="emitDeleteCard" class="open-card-menu-item">delete</div>
           <div class="open-card-menu-item">edit</div>
         </div>
       </div>
@@ -51,7 +51,7 @@ export default {
       this.$on("draggedCardEnteredDragZone", this.expandDragZoneHeight);
       this.$on("draggedCardLeftDragZone", this.collapseDragZoneHeight);
     },
-
+    // state management
     toggleOpenCardMenu() {
       this.openCardMenu = !this.openCardMenu;
     },
@@ -72,10 +72,12 @@ export default {
       this.ellipses = false;
     },
 
-    deleteCard() {
+    // emit CRUD events
+    emitDeleteCard() {
       this.$emit("cardDeleted", this.card);
     },
 
+    // drag methods
     cardDragStart(event) {
       const draggedCardId = this.card.id;
       const draggedCardListId = this.card._list_id;

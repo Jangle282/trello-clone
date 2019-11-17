@@ -58,7 +58,13 @@ export default {
     };
   },
 
+  created() {
+    this.getCards();
+    this.getLists();
+  },
+
   methods: {
+    // AXIOS methods
     getCards() {
       axios.get("/cards").then(response => {
         this.cards = response.data;
@@ -69,14 +75,6 @@ export default {
       axios.get("/slists").then(response => {
         this.lists = response.data;
       });
-    },
-
-    toggleAddCards(listId) {
-      this.listIdforopenAddCard = listId;
-    },
-
-    toggleListForm() {
-      this.listFormOpen = !this.listFormOpen;
     },
 
     fireCreateSlist() {
@@ -92,6 +90,15 @@ export default {
           console.log("error in when creating new list");
         });
       this.listFormOpen = false;
+    },
+
+    // state management
+    toggleAddCards(listId) {
+      this.listIdforopenAddCard = listId;
+    },
+
+    toggleListForm() {
+      this.listFormOpen = !this.listFormOpen;
     },
 
     newCard(newCardData) {
@@ -116,11 +123,6 @@ export default {
         return list.id !== listId;
       });
     }
-  },
-
-  created() {
-    this.getCards();
-    this.getLists();
   }
 };
 </script>

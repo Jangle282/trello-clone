@@ -83,7 +83,12 @@ export default {
     }
   },
 
+  created() {
+    if (this.cards) this.filterCards();
+  },
+
   methods: {
+    // drag methods
     cardDropped(cardDragData) {
       const nextCard =
         this.filteredCards.find(
@@ -114,17 +119,7 @@ export default {
       this.filteredCards.splice(cardIndex, 1);
     },
 
-    fireUpdateCard(cardData) {
-      axios
-        .put(`cards/${cardData.id}`, cardData)
-        .then(response => {
-          this.$emit("updateCards");
-        })
-        .catch(err => {
-          console.log(err);
-        });
-    },
-
+    // state management
     filterCards() {
       this.filteredCards = this.cards
         .filter(card => {
@@ -133,6 +128,27 @@ export default {
         .sort((a, b) => a.list_order - b.list_order);
     },
 
+    resetAddCardValues() {
+      this.newCardData = {
+        name: "",
+        description: "",
+        _list_id: this.slist.id
+      };
+    },
+
+    toggleOpenListMenu() {
+      this.openListMenu = !this.openListMenu;
+    },
+
+    showEllipses() {
+      this.ellipses = true;
+    },
+
+    hideEllipses() {
+      this.ellipses = false;
+    },
+
+    // AXIOS methods
     submitAddCard() {
       var newCard = this.newCardData;
       newCard.list_order =
@@ -149,24 +165,15 @@ export default {
         });
     },
 
-    resetAddCardValues() {
-      this.newCardData = {
-        name: "",
-        description: "",
-        _list_id: this.slist.id
-      };
-    },
-
-    confirmDeleteCardMessage(data) {
-      if (confirm("Are you sure you want to delete this card?")) {
-        this.deleteCard(data);
-      }
-    },
-
-    confirmDeleteListMessage() {
-      if (confirm("Are you sure you want to delete this list?")) {
-        this.deleteSlist();
-      }
+    fireUpdateCard(cardData) {
+      axios
+        .put(`cards/${cardData.id}`, cardData)
+        .then(response => {
+          this.$emit("updateCards");
+        })
+        .catch(err => {
+          console.log(err);
+        });
     },
 
     deleteCard(data) {
@@ -190,21 +197,18 @@ export default {
         });
     },
 
-    toggleOpenListMenu() {
-      this.openListMenu = !this.openListMenu;
+    // alerts and pop ups
+    confirmDeleteCardMessage(data) {
+      if (confirm("Are you sure you want to delete this card?")) {
+        this.deleteCard(data);
+      }
     },
 
-    showEllipses() {
-      this.ellipses = true;
-    },
-
-    hideEllipses() {
-      this.ellipses = false;
+    confirmDeleteListMessage() {
+      if (confirm("Are you sure you want to delete this list?")) {
+        this.deleteSlist();
+      }
     }
-  },
-
-  created() {
-    if (this.cards) this.filterCards();
   }
 };
 </script>
