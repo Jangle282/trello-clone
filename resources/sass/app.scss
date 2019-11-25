@@ -52,7 +52,7 @@ body {
     justify-content: flex-start;
     width: 250px;
     margin: 10px 4px;
-    padding: 10px 0 5px;
+    padding: 4px 0 5px;
     border-radius: 2px;
     background-color: #dcdcdc;
     // overflow-y: auto;
@@ -61,30 +61,41 @@ body {
 
 .list-header {
     background-color: #dcdcdc;
-    margin-bottom: 5px;
+    margin-bottom: 3px;
     min-width: 0;
-    padding: 0 10px;
+    padding: 0 4px;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: flex-start;
 
     .ellipses {
         margin: 0 0;
-        width: 10%;
         display: inline-block;
         cursor: pointer;
+        padding: 0 7px;
+        height: 1.5em;
+
+        &:hover {
+            background-color: dimgray;
+            border-radius: 2px;
+        }
+
+        .dots {
+            margin-top: -4px
+        }
     }
 }
 
 .list-header h6 {
     margin: 0;
-    padding: 0 5px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 165px;
+    padding: 5px 5px 5px 15px;
 }
 
 .cardList {
     max-height: 85vh;
     overflow-y: auto;
+    margin-right: 2px;
 }
 
 .add-card-form {
@@ -92,15 +103,36 @@ body {
 }
 
 .card-container {
-    padding: 0 10px;
+    padding: 2px 14px 0 10px;
+
+    &:hover {
+        .ellipses {
+            background-color: lightgray;
+            display: inline-block;
+            text-align: center;
+            margin: 4px 0;
+            border-radius: 2px;
+            width: 8%;
+            cursor: pointer;
+
+            &:hover {
+                background-color: dimgray;
+            }
+        }
+    }
 }
 
 .task-card {
     color: rgb(48, 48, 48);
     width: 100%;
-    padding: 0 8px;
+    padding: 0 4px 0 8px;
     background-color: #f6f6f6;
-    border-radius: 4px;
+    border-radius: 2px;
+    box-shadow: 0 1px 0 rgba(9, 30, 66, .25);
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: flex-start;
 
     .card-name {
         margin: 0 0;
@@ -109,11 +141,13 @@ body {
     }
 
     .ellipses {
-        margin: 0 0;
-        width: 10%;
-        display: inline-block;
-        cursor: pointer;
+        display: none;
+
+        .dots {
+            font-size: 11px
+        }
     }
+
 }
 
 .dragged-card {
@@ -144,7 +178,7 @@ body {
 }
 
 .drag-zone {
-    height: 15px;
+    height: 7px;
 
     &.expand-drag-zone {
         height: 50px;

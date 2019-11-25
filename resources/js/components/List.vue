@@ -1,8 +1,12 @@
 <template>
   <div class="list">
-    <div @mouseover="showEllipses" @mouseleave="hideEllipses" class="list-header">
-      <h6>{{slist.name || "add a list"}}</h6>
-      <div v-if="ellipses" class="ellipses" @click="toggleOpenListMenu">...</div>
+    <div class="list-header">
+      <div class="list-title-container">
+        <h6>{{slist.name || "add a list"}}</h6>
+      </div>
+      <div class="ellipses" @click="toggleOpenListMenu">
+        <div class="dots">...</div>
+      </div>
       <div v-if="openListMenu" class>
         <div class="open-list-menu">
           <div @click="confirmDeleteListMessage" class="open-card-list-item">delete</div>
@@ -79,7 +83,6 @@ export default {
         description: "",
         list_order: 1
       },
-      ellipses: false,
       openListMenu: false,
       cardIsDragged: Number
     };
@@ -146,14 +149,6 @@ export default {
 
     toggleOpenListMenu() {
       this.openListMenu = !this.openListMenu;
-    },
-
-    showEllipses() {
-      this.ellipses = true;
-    },
-
-    hideEllipses() {
-      this.ellipses = false;
     },
 
     // AXIOS methods
@@ -228,20 +223,6 @@ export default {
 };
 </script>
 
-// dropped card needs to be spliced into the filtered cards array according to the indexes of the cards around it.
-// add an order value to cards 
-// add it to the Model 
-// add it to the seeder - maybe just random number or whatever - just not in the same order as the IDs. 
-// reseed the database 
-// 
-// they should then be ordered by that value when they are filtered
-// when a card is dropped the order value needs to be set between the two cards where it is dropped
-// so the order value has to be able to be a decimal
-// also need to do an ajax edit call to update the list id and the order number of the card
-// the list where it came from also has to remove the card from it's filtered items and 
-// this will required sibling communication ... maybe not i think the 
-// need a drop zone when list is empty - either in addcard or make a container that is the whole length that just appendsto the end
-// this would need some visual feedback on it too 
 
 <style>
 </style>

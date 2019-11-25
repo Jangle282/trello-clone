@@ -4,12 +4,12 @@
       draggable="true"
       @dragstart="cardDragStart"
       @dragend="cardDragEnded"
-      @mouseover="showEllipses"
-      @mouseleave="hideEllipses"
       :class="[{'dragged-card' : cardIsDragged}, 'task-card']"
     >
       <p class="card-name">{{ card.name }}</p>
-      <div v-if="ellipses" class="ellipses" @click="toggleOpenCardMenu">...</div>
+      <div class="ellipses" @click="toggleOpenCardMenu">
+        <div class="dots">...</div>
+      </div>
       <div v-if="openCardMenu">
         <div class="open-card-menu">
           <div @click="emitDeleteCard" class="open-card-menu-item">delete</div>
@@ -36,7 +36,6 @@ export default {
   data() {
     return {
       openCardMenu: false,
-      ellipses: false,
       cardIsDragged: false,
       expandDragZone: false
     };
@@ -62,14 +61,6 @@ export default {
 
     collapseDragZoneHeight() {
       this.expandDragZone = false;
-    },
-
-    showEllipses() {
-      this.ellipses = true;
-    },
-
-    hideEllipses() {
-      this.ellipses = false;
     },
 
     // emit CRUD events
