@@ -66,10 +66,22 @@ body {
     padding: 0 4px;
     display: flex;
     flex-flow: row nowrap;
-    justify-content: space-between;
     align-items: flex-start;
 
-    .ellipses {
+    .list-title-container {
+        flex-grow: 1;
+    }
+
+    h6 {
+        margin: 0;
+        padding: 5px 5px 5px 15px;
+    }
+
+    .edit-title-open {
+        border: 1px solid chartreuse;
+    }
+
+    .delete-button {
         margin: 0 0;
         display: inline-block;
         cursor: pointer;
@@ -80,16 +92,7 @@ body {
             background-color: dimgray;
             border-radius: 2px;
         }
-
-        .dots {
-            margin-top: -4px
-        }
     }
-}
-
-.list-header h6 {
-    margin: 0;
-    padding: 5px 5px 5px 15px;
 }
 
 .cardList {
@@ -150,11 +153,6 @@ body {
 
 }
 
-.dragged-card {
-    background-color: rgb(48, 48, 48);
-    color: #f6f6f6;
-}
-
 .open-card-menu {
     border: 1px solid black;
     // these things make a full screen overlay
@@ -166,15 +164,11 @@ body {
     // right: 0;
 }
 
-.open-list-menu {
-    border: 1px solid black;
-    // these things make a full screen overlay
-    // within that overlay 
-    // width: 100vw;
-    // height: 100vh;
-    // position: fixed;
-    // top: 0;
-    // right: 0;
+
+
+.dragged-card {
+    background-color: rgb(48, 48, 48);
+    color: #f6f6f6;
 }
 
 .drag-zone {

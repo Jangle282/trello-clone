@@ -76,7 +76,11 @@ class SlistController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $slist = Slist::find($request['id']);
+        $slist->name = $request['name'];
+        $slist->save();
+
+        return response(Response::HTTP_OK);
     }
 
     /**

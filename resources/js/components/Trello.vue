@@ -29,8 +29,10 @@
             <div @click="fireCreateSlist">Add</div>
             <div @click="toggleListForm">X</div>
           </div>
-          <div v-else class="addList">
-            <p @click="toggleListForm">Add a List</p>
+          <div v-else class="list-header">
+            <div @click="toggleListForm" class="list-title-container">
+              <h6>Add a List</h6>
+            </div>
           </div>
         </div>
       </div>

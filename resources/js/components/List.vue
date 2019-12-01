@@ -1,19 +1,19 @@
 <template>
   <div class="list">
     <div class="list-header">
-      <div class="list-title-container">
+      <div v-if="editTitleOpen" class="edit-title-open, list-title-container">
+        <input v-model="slist.name" @keyup.enter="saveListTitle" ref="listTitle" />
+      </div>
+
+      <div v-else @click="openEditTitle" class="list-title-container">
         <h6>{{slist.name || "add a list"}}</h6>
       </div>
-      <div class="ellipses" @click="toggleOpenListMenu">
-        <div class="dots">...</div>
-      </div>
-      <div v-if="openListMenu" class>
-        <div class="open-list-menu">
-          <div @click="confirmDeleteListMessage" class="open-card-list-item">delete</div>
-          <div class="open-card-list-item">edit</div>
-        </div>
+
+      <div class="delete-button" @click="confirmDeleteListMessage">
+        <div>X</div>
       </div>
     </div>
+
     <div class="cardList">
       <Card
         v-for="(card, index) in filteredCards"
@@ -38,6 +38,7 @@
       <div @click="$emit('toggleAddCards', null)">X</div>
       <div>...</div>
     </div>
+
     <div
       v-else
       class="add-card-form"
@@ -83,7 +84,7 @@ export default {
         description: "",
         list_order: 1
       },
-      openListMenu: false,
+      editTitleOpen: false,
       cardIsDragged: Number
     };
   },
@@ -147,8 +148,14 @@ export default {
       };
     },
 
-    toggleOpenListMenu() {
-      this.openListMenu = !this.openListMenu;
+    openEditTitle() {
+      this.editTitleOpen = true;
+      this.focusInput("listTitle");
+    },
+
+    saveListTitle() {
+      this.editTitleOpen = false;
+      this.fireUpdateSlist();
     },
 
     // AXIOS methods
@@ -190,6 +197,16 @@ export default {
         });
     },
 
+    fireUpdateSlist() {
+      const listId = this.slist.id;
+      axios
+        .put(`/slists/${listId}`, this.slist)
+        .then(() => {})
+        .catch(err => {
+          console.log("error updating list");
+        });
+    },
+
     deleteSlist() {
       const listId = this.slist.id;
       this.$emit("listDeleted", listId);
@@ -214,10 +231,16 @@ export default {
       }
     },
 
-    focusInput() {
-      this.$nextTick(() => {
-        this.$refs.cardTitle.focus();
-      });
+    focusInput(ref) {
+      if (ref === "listTitle") {
+        this.$nextTick(() => {
+          this.$refs[ref].focus();
+        });
+      } else {
+        this.$nextTick(() => {
+          this.$refs.cardTitle.focus();
+        });
+      }
     }
   }
 };
