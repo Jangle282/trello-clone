@@ -94,12 +94,13 @@ class CardController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $draggedCard = Card::find($request['id']);
-        $draggedCard->_list_id = $request['_list_id'];
-        $draggedCard->list_order = $request['list_order'];
-        $draggedCard->save();
+        $card = Card::find($request['id']);
+        $card->_list_id = $request['_list_id'];
+        $card->list_order = $request['list_order'];
+        // $card->description = $request['description'];
+        $card->save();
 
-        return response($draggedCard, Response::HTTP_OK);
+        return response($card, Response::HTTP_OK);
     }
 
     /**

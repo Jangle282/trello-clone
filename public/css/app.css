@@ -10705,52 +10705,88 @@ body {
   display: flex;
   flex-flow: column nowrap;
   justify-content: flex-start;
-  width: 230px;
+  width: 250px;
   margin: 10px 4px;
-  padding: 10px 10px 5px;
+  padding: 4px 0 5px;
   border-radius: 2px;
   background-color: #dcdcdc;
 }
 
 .list-header {
   background-color: #dcdcdc;
-  margin-bottom: 5px;
+  margin-bottom: 3px;
   min-width: 0;
+  padding: 0 4px;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: flex-start;
 }
 
-.list-header .ellipses {
-  margin: 0 0;
-  width: 10%;
-  display: inline-block;
-  cursor: pointer;
+.list-header .list-title-container {
+  flex-grow: 1;
 }
 
 .list-header h6 {
   margin: 0;
-  padding: 0 5px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 165px;
+  padding: 5px 5px 5px 15px;
+}
+
+.list-header .edit-title-open {
+  border: 1px solid chartreuse;
+}
+
+.list-header .delete-button {
+  margin: 0 0;
+  display: inline-block;
+  cursor: pointer;
+  padding: 0 7px;
+  height: 1.5em;
+}
+
+.list-header .delete-button:hover {
+  background-color: dimgray;
+  border-radius: 2px;
 }
 
 .cardList {
   max-height: 85vh;
   overflow-y: auto;
+  margin-right: 2px;
 }
 
-.dragged-card {
-  background-color: aliceblue;
-  color: gainsboro;
+.add-card-form {
+  padding: 5px 10px 5px 15px;
+}
+
+.card-container {
+  padding: 2px 14px 0 10px;
+}
+
+.card-container:hover .ellipses {
+  background-color: lightgray;
+  display: inline-block;
+  text-align: center;
+  margin: 4px 0;
+  border-radius: 2px;
+  width: 8%;
+  cursor: pointer;
+}
+
+.card-container:hover .ellipses:hover {
+  background-color: dimgray;
 }
 
 .task-card {
   color: #303030;
   width: 100%;
-  padding: 5px 8px;
+  padding: 0 4px 0 8px;
   background-color: #f6f6f6;
-  border-radius: 4px;
-  margin: 8px 0px;
+  border-radius: 2px;
+  box-shadow: 0 1px 0 rgba(9, 30, 66, 0.25);
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: flex-start;
 }
 
 .task-card .card-name {
@@ -10760,17 +10796,43 @@ body {
 }
 
 .task-card .ellipses {
-  margin: 0 0;
-  width: 10%;
-  display: inline-block;
-  cursor: pointer;
+  display: none;
 }
 
-.open-card-menu {
-  border: 1px solid black;
+.task-card .ellipses .dots {
+  font-size: 11px;
 }
 
-.open-list-menu {
+.open-card-menu-overlay {
   border: 1px solid black;
+  background-color: rgba(9, 30, 66, 0.25);
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.card-detail-container {
+  background-color: #f6f6f6;
+  position: relative;
+  top: -23px;
+  width: 100%;
+  z-index: 1;
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.dragged-card {
+  background-color: #303030;
+  color: #f6f6f6;
+}
+
+.drag-zone {
+  height: 7px;
+}
+
+.drag-zone.expand-drag-zone {
+  height: 50px;
 }
 

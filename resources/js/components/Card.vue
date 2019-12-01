@@ -7,16 +7,25 @@
       :class="[{'dragged-card' : cardIsDragged}, 'task-card']"
     >
       <p class="card-name">{{ card.name }}</p>
+
       <div class="ellipses" @click="toggleOpenCardMenu">
         <div class="dots">...</div>
       </div>
-      <div v-if="openCardMenu">
-        <div class="open-card-menu">
-          <div @click="emitDeleteCard" class="open-card-menu-item">delete</div>
-          <div class="open-card-menu-item">edit</div>
-        </div>
+    </div>
+
+    <div v-if="openCardMenu" class="card-detail-container task-card">
+      <div class="card-edit-inputs">
+        <input v-model="card.name" />
+        <textarea v-model="card.description" />
+      </div>
+      <div class="card-edit-btns">
+        <div @click="fireUpdateCard" class>save</div>
+        <div @click="emitDeleteCard" class>delete</div>
       </div>
     </div>
+
+    <div v-if="openCardMenu" @click="toggleOpenCardMenu" class="open-card-menu-overlay"></div>
+
     <div
       :class="[{ 'expand-drag-zone' : expandDragZone}, 'drag-zone' ]"
       @dragenter="cardDragEnter"
@@ -31,10 +40,14 @@
 export default {
   name: "Card",
   props: {
-    card: Object
+    cardData: Object
   },
   data() {
     return {
+      card: {
+        type: Object,
+        required: false
+      },
       openCardMenu: false,
       cardIsDragged: false,
       expandDragZone: false
@@ -43,6 +56,7 @@ export default {
 
   mounted() {
     this.setEventListeners();
+    this.setInitialstate();
   },
 
   methods: {
@@ -51,6 +65,10 @@ export default {
       this.$on("draggedCardLeftDragZone", this.collapseDragZoneHeight);
     },
     // state management
+    setInitialstate() {
+      this.card = this.cardData;
+    },
+
     toggleOpenCardMenu() {
       this.openCardMenu = !this.openCardMenu;
     },
@@ -66,6 +84,17 @@ export default {
     // emit CRUD events
     emitDeleteCard() {
       this.$emit("cardDeleted", this.card);
+    },
+
+    fireUpdateCard() {
+      axios
+        .put(`cards/${this.card.id}`, this.card)
+        .then(response => {
+          this.$emit("updateCards");
+        })
+        .catch(err => {
+          console.log(err);
+        });
     },
 
     // drag methods

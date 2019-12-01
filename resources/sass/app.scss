@@ -153,15 +153,26 @@ body {
 
 }
 
-.open-card-menu {
+.open-card-menu-overlay {
     border: 1px solid black;
+    background-color: rgba(9, 30, 66, .25);
     // these things make a full screen overlay
     // within that overlay 
-    // width: 100vw;
-    // height: 100vh;
-    // position: fixed;
-    // top: 0;
-    // right: 0;
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.card-detail-container {
+    background-color: #f6f6f6;
+    position: relative;
+    top: -23px;
+    width: 100%;
+    z-index: 1;
+    display: flex;
+    flex-flow: column nowrap;
 }
 
 

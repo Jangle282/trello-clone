@@ -18,7 +18,7 @@
       <Card
         v-for="(card, index) in filteredCards"
         :key="index"
-        v-bind:card="card"
+        v-bind:cardData="card"
         @cardDeleted="confirmDeleteCardMessage"
         @cardDropped="cardDropped"
         @removedDraggedCard="cardRemovedByDrag"
