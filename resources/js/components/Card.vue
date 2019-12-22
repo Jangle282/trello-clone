@@ -127,6 +127,10 @@ export default {
     },
 
     cardDragDrop(event) {
+      console.log(
+        "drop",
+        event.dataTransfer.getData("text/plain").split(",")[0] * 1
+      );
       event.preventDefault();
       const cardDragData = {
         draggedCardId:
@@ -143,9 +147,10 @@ export default {
     },
 
     cardDragEnded(event) {
+      console.log("end", event.dataTransfer.getData("text/plain"));
       this.cardIsDragged = false;
       if (event.dataTransfer.dropEffect !== "none") {
-        this.$emit("removedDraggedCard", this.card.id);
+        this.$emit("removedDraggedCard", this.card);
       }
     }
   }

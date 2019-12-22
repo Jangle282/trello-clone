@@ -16,8 +16,8 @@
 
     <div class="cardList">
       <Card
-        v-for="(card, index) in filteredCards"
-        :key="index"
+        v-for="(card) in filteredCards"
+        :key="card.id"
         v-bind:cardData="card"
         @cardDeleted="confirmDeleteCardMessage"
         @cardDropped="cardDropped"
@@ -102,33 +102,58 @@ export default {
   methods: {
     // drag methods
     cardDropped(cardDragData) {
-      const nextCard =
+      const nextCardInList =
         this.filteredCards.find(
           card => card.list_order > cardDragData.dropZoneListOrder
         ) || null;
-      const cardNewListOrder =
-        nextCard !== null
+
+      const droppedCardNewListOrder =
+        nextCardInList !== null
           ? cardDragData.dropZoneListOrder +
-            (nextCard.list_order - cardDragData.dropZoneListOrder) / 2
+            (nextCardInList.list_order - cardDragData.dropZoneListOrder) / 2
           : cardDragData.dropZoneListOrder + 0.1;
-      const dropZoneListIndex = this.filteredCards.findIndex(
-        card => card.id === cardDragData.dropZoneCardId
-      );
+
       const droppedCard = {
         name: cardDragData.draggedCardName,
         id: cardDragData.draggedCardId,
         _list_id: this.slist.id,
-        list_order: cardNewListOrder
+        list_order: droppedCardNewListOrder
       };
-      this.filteredCards.splice(dropZoneListIndex + 1, 0, droppedCard);
+
+      // if card is dropped within the same list, just update it's list order
+      if (this.slist.id === cardDragData.draggedCardListId) {
+        console.log("dropped if");
+        const cardIndex = this.filteredCards.findIndex(
+          card => card.id === cardDragData.draggedCardId
+        );
+        console.log(this.filteredCards[cardIndex].list_order);
+
+        this.filteredCards[cardIndex].list_order = droppedCardNewListOrder;
+        this.filterCards();
+        console.log(this.filteredCards[cardIndex].list_order);
+      } else {
+        console.log("dropped else");
+        // otherwise splice card into the list in the dropzone
+        // it will be removed from the list of origin via dragend event.
+        const dropZoneListIndex = this.filteredCards.findIndex(
+          card => card.id === cardDragData.dropZoneCardId
+        );
+        this.filteredCards.splice(dropZoneListIndex + 1, 0, droppedCard);
+      }
       this.fireUpdateCard(droppedCard);
     },
 
-    cardRemovedByDrag(cardId) {
-      const cardIndex = this.filteredCards.findIndex(
-        card => card.id === cardId
-      );
-      this.filteredCards.splice(cardIndex, 1);
+    cardRemovedByDrag(cardData) {
+      if (cardData._list_id === this.slist.id) {
+        console.log("if", cardData._list_id, this.slist.id);
+        // return;
+      } else {
+        console.log("else", cardData, this.slist.id);
+        const cardIndex = this.filteredCards.findIndex(
+          card => card.id === cardData.id
+        );
+        this.filteredCards.splice(cardIndex, 1);
+      }
     },
 
     // state management
