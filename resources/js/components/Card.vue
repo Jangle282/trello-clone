@@ -97,8 +97,9 @@ export default {
         });
     },
 
-    // drag methods
+    // drag methods for dragged card
     cardDragStart(event) {
+      // puts card data in the drag event. Sets drag style on the selected card
       const draggedCardId = this.card.id;
       const draggedCardListId = this.card._list_id;
       event.dataTransfer.setData(
@@ -109,24 +110,41 @@ export default {
       this.cardIsDragged = true;
     },
 
+    cardDragEnded(event) {
+      // fired by dragged card to by the original list when dropped elsewhere.
+      console.log("carddragend", event.dataTransfer.dropEffect !== "none");
+      this.cardIsDragged = false;
+      if (event.dataTransfer.dropEffect !== "none") {
+        console.log("emmtted dragend evet", this.card);
+        this.$emit("removedDraggedCard", this.card);
+      }
+    },
+
+    // drag methods for receiving card drag zone
     cardDragOver(event) {
+      // fired when the dragged card is over a receptive div i think i can remove this...
       event.preventDefault();
       event.dataTransfer.dropEffect = "move";
     },
 
     cardDragEnter() {
+      // fired when a dragged card enters a drag zone - expands the drag zone
       event.preventDefault();
       event.dataTransfer.dropEffect = "move";
       this.$emit("draggedCardEnteredDragZone", this.card.id);
     },
 
     cardDragLeave() {
+      // fired when a dragged card leaves a drag zone - collapses the drag zone div
       event.preventDefault();
       event.dataTransfer.dropEffect = "move";
       this.$emit("draggedCardLeftDragZone");
     },
 
     cardDragDrop(event) {
+      // when cursor is relased over the div
+      // retreives data about the card from the event
+      //
       console.log(
         "drop",
         event.dataTransfer.getData("text/plain").split(",")[0] * 1
@@ -142,16 +160,10 @@ export default {
         dropZoneListId: this.card._list_id,
         dropZoneListOrder: this.card.list_order
       };
+      // emit to list the card data to be added/changed in the receiving list
       this.$emit("cardDropped", cardDragData);
+      // collapse drag zone
       this.$emit("draggedCardLeftDragZone");
-    },
-
-    cardDragEnded(event) {
-      console.log("end", event.dataTransfer.getData("text/plain"));
-      this.cardIsDragged = false;
-      if (event.dataTransfer.dropEffect !== "none") {
-        this.$emit("removedDraggedCard", this.card);
-      }
     }
   }
 };

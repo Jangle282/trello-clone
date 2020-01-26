@@ -1,5 +1,5 @@
  <template>
-  <div>
+  <div class="pageContainer">
     <TopBar />
     <div class="mainContainer">
       <div class="board">
@@ -77,6 +77,7 @@ export default {
     getCards() {
       axios.get("/cards").then(response => {
         this.cards = response.data;
+        console.log("cards updated");
       });
     },
 

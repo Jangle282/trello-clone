@@ -85,7 +85,8 @@ export default {
         list_order: 1
       },
       editTitleOpen: false,
-      cardIsDragged: Number
+      cardIsDragged: Number,
+      droppedInSameList: false
     };
   },
 
@@ -99,9 +100,20 @@ export default {
     if (this.cards) this.filterCards();
   },
 
+  mounted() {
+    // this.setEventListeners();
+  },
+
   methods: {
+    // setEventListeners() {
+    //   this.$on("removedDraggedCard", this.cardRemovedByDrag);
+    // },
+
     // drag methods
+
     cardDropped(cardDragData) {
+      // event emmitted by the dragzone div received by target list.
+      // adds the dropped card data to the receiving list
       const nextCardInList =
         this.filteredCards.find(
           card => card.list_order > cardDragData.dropZoneListOrder
@@ -122,17 +134,13 @@ export default {
 
       // if card is dropped within the same list, just update it's list order
       if (this.slist.id === cardDragData.draggedCardListId) {
-        console.log("dropped if");
+        this.droppedInSameList = true;
         const cardIndex = this.filteredCards.findIndex(
           card => card.id === cardDragData.draggedCardId
         );
-        console.log(this.filteredCards[cardIndex].list_order);
-
         this.filteredCards[cardIndex].list_order = droppedCardNewListOrder;
         this.filterCards();
-        console.log(this.filteredCards[cardIndex].list_order);
       } else {
-        console.log("dropped else");
         // otherwise splice card into the list in the dropzone
         // it will be removed from the list of origin via dragend event.
         const dropZoneListIndex = this.filteredCards.findIndex(
@@ -144,15 +152,19 @@ export default {
     },
 
     cardRemovedByDrag(cardData) {
-      if (cardData._list_id === this.slist.id) {
-        console.log("if", cardData._list_id, this.slist.id);
-        // return;
-      } else {
-        console.log("else", cardData, this.slist.id);
+      // console.log(
+      //   "removed method, list ID, boolean: ",
+      //   this.slist.id,
+      //   this.droppedInSameList
+      // );
+      if (!this.droppedInSameList) {
+        console.log("dropped in dfferent list", this.droppedInSameList);
         const cardIndex = this.filteredCards.findIndex(
           card => card.id === cardData.id
         );
         this.filteredCards.splice(cardIndex, 1);
+      } else {
+        this.droppedInSameList = false;
       }
     },
 
