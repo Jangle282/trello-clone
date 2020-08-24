@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Slist;
+use App\Column;
 
-class SlistController extends Controller
+class ColumnController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,7 +15,7 @@ class SlistController extends Controller
      */
     public function index()
     {
-        return response(Slist::all()->jsonSerialize(), Response::HTTP_OK);
+        return response(Column::all()->jsonSerialize(), Response::HTTP_OK);
     }
 
     /**
@@ -36,13 +36,13 @@ class SlistController extends Controller
      */
     public function store(Request $request)
     {
-        $slist = new Slist();
+        $column = new Column();
 
-        $slist->name = request('name');
+        $column->name = request('name');
 
-        $slist->save();
+        $column->save();
 
-        return response($slist, Response::HTTP_OK);
+        return response($column, Response::HTTP_OK);
     }
 
     /**
@@ -76,9 +76,9 @@ class SlistController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $slist = Slist::find($request['id']);
-        $slist->name = $request['name'];
-        $slist->save();
+        $column = Column::find($request['id']);
+        $column->name = $request['name'];
+        $column->save();
 
         return response(Response::HTTP_OK);
     }
@@ -91,8 +91,8 @@ class SlistController extends Controller
      */
     public function destroy($id)
     {
-        $slist = Slist::find($id);
-        $slist->delete();
+        $column = Column::find($id);
+        $column->delete();
         return response(Response::HTTP_OK);
     }
 }

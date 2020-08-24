@@ -101,17 +101,17 @@ export default {
     cardDragStart(event) {
       // puts card data in the drag event. Sets drag style on the selected card
       const draggedCardId = this.card.id;
-      const draggedCardListId = this.card._list_id;
+      const draggedCardColId = this.card.column_id;
       event.dataTransfer.setData(
         "text/plain",
-        `${draggedCardId},${draggedCardListId},${this.card.name}`
+        `${draggedCardId},${draggedCardColId},${this.card.name}`
       );
       event.dataTransfer.effectAllowed = "move";
       this.cardIsDragged = true;
     },
 
     cardDragEnded(event) {
-      // fired by dragged card to by the original list when dropped elsewhere.
+      // fired by dragged card to by the original column when dropped elsewhere.
       console.log("carddragend", event.dataTransfer.dropEffect !== "none");
       this.cardIsDragged = false;
       if (event.dataTransfer.dropEffect !== "none") {
@@ -153,14 +153,14 @@ export default {
       const cardDragData = {
         draggedCardId:
           event.dataTransfer.getData("text/plain").split(",")[0] * 1,
-        draggedCardListId:
+        draggedCardColId:
           event.dataTransfer.getData("text/plain").split(",")[1] * 1,
         draggedCardName: event.dataTransfer.getData("text/plain").split(",")[2],
         dropZoneCardId: this.card.id,
-        dropZoneListId: this.card._list_id,
-        dropZoneListOrder: this.card.list_order
+        dropZoneColId: this.card.column_id,
+        dropZoneColOrder: this.card.column_order
       };
-      // emit to list the card data to be added/changed in the receiving list
+      // emit to column the card data to be added/changed in the receiving column
       this.$emit("cardDropped", cardDragData);
       // collapse drag zone
       this.$emit("draggedCardLeftDragZone");

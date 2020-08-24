@@ -10671,6 +10671,11 @@ body {
 #app {
   display: flex;
   width: 100%;
+  height: 100%;
+}
+
+.pageContainer {
+  width: 100%;
 }
 
 .mainContainer {
@@ -10678,6 +10683,7 @@ body {
   display: flex;
   flex-direction: column;
   width: 100%;
+  height: 100%;
 }
 
 .topbar {
@@ -10701,7 +10707,7 @@ body {
   padding: 10px;
 }
 
-.list {
+.column {
   display: flex;
   flex-flow: column nowrap;
   justify-content: flex-start;
@@ -10712,7 +10718,7 @@ body {
   background-color: #dcdcdc;
 }
 
-.list-header {
+.column-header {
   background-color: #dcdcdc;
   margin-bottom: 3px;
   min-width: 0;
@@ -10722,20 +10728,20 @@ body {
   align-items: flex-start;
 }
 
-.list-header .list-title-container {
+.column-header .column-title-container {
   flex-grow: 1;
 }
 
-.list-header h6 {
+.column-header h6 {
   margin: 0;
   padding: 5px 5px 5px 15px;
 }
 
-.list-header .edit-title-open {
+.column-header .edit-title-open {
   border: 1px solid chartreuse;
 }
 
-.list-header .delete-button {
+.column-header .delete-button {
   margin: 0 0;
   display: inline-block;
   cursor: pointer;
@@ -10743,7 +10749,7 @@ body {
   height: 1.5em;
 }
 
-.list-header .delete-button:hover {
+.column-header .delete-button:hover {
   background-color: dimgray;
   border-radius: 2px;
 }

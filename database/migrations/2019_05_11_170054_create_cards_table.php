@@ -18,9 +18,9 @@ class CreateCardsTable extends Migration
             $table->timestamps();
             $table->string('name');
             $table->text('description')->nullable()->default(null);
-            $table->bigInteger('_list_id')->unsigned();
-            $table->decimal('list_order', 10, 9);
-            $table->foreign('_list_id')->references('id')->on('slists')->onDelete('cascade');
+            $table->bigInteger('column_id')->unsigned();
+            $table->decimal('column_order', 10, 9);
+            $table->foreign('column_id')->references('id')->on('columns')->onDelete('cascade');
         });
     }
 

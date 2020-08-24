@@ -1,3 +1,5 @@
+import store from './store/store.js'
+
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
@@ -29,4 +31,5 @@ Vue.component('Trello', require('./components/Trello.vue').default);
 
 const app = new Vue({
     el: '#app',
+    store,
 });

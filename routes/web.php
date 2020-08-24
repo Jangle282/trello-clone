@@ -21,6 +21,6 @@ Route::post('/cards/{id}', 'CardController@destroy');
 
 Route::resource('cards', "CardController");
 
-Route::post('/slists/{id}', 'SlistController@destroy');
+Route::post('/columns/{id}', 'ColumnController@destroy');
 
-Route::resource('slists', "SlistController");
+Route::resource('columns', "ColumnController");

@@ -1,37 +1,37 @@
- <template>
+<template>
   <div class="pageContainer">
     <TopBar />
     <div class="mainContainer">
       <div class="board">
-        <List
-          v-for="list in this.lists"
-          :key="list.id"
+        <Column
+          v-for="column in this.columns"
+          :key="column.id"
           v-bind:cards="cards"
-          v-bind:listIdforopenAddCard="listIdforopenAddCard"
-          v-bind:slist="list"
+          v-bind:colIdForOpenAddCard="colIdForOpenAddCard"
+          v-bind:column="column"
           v-on:toggleAddCards="toggleAddCards"
           @newCardCreated="newCard"
           @cardDeleted="deleteCard"
-          @listDeleted="deleteList"
+          @colDeleted="deleteColumn"
           @updateCards="getCards"
         />
 
-        <div class="list">
-          <div v-if="listFormOpen" class="addListForm">
+        <div class="column">
+          <div v-if="colFormOpen" class="addColForm">
             <input
-              v-model="newListData.name"
+              v-model="newColData.name"
               type="text"
               name="title"
               id="title"
-              ref="listTitle"
-              @keyup.enter="fireCreateSlist"
+              ref="colTitle"
+              @keyup.enter="fireCreateColumn"
             />
-            <div @click="fireCreateSlist">Add</div>
-            <div @click="toggleListForm">X</div>
+            <div @click="fireCreateColumn">Add</div>
+            <div @click="toggleColForm">X</div>
           </div>
-          <div v-else class="list-header">
-            <div @click="toggleListForm" class="list-title-container">
-              <h6>Add a List</h6>
+          <div v-else class="column-header">
+            <div @click="toggleColForm" class="column-title-container">
+              <h6>Add a Column</h6>
             </div>
           </div>
         </div>
@@ -44,24 +44,24 @@
 <script>
 import TopBar from "./TopBar";
 import Board from "./Board";
-import List from "./List";
+import Column from "./Column";
 
 export default {
-  name: "Trello",
+    name: "Trello",
 
-  components: {
-    TopBar,
-    Board,
-    List
-  },
+    components: {
+      TopBar,
+      Board,
+      Column
+    },
 
   data() {
     return {
-      lists: null,
+      columns: null,
       cards: null,
-      listIdforopenAddCard: null,
-      listFormOpen: false,
-      newListData: {
+      colIdForOpenAddCard: null,
+      colFormOpen: false,
+      newColData: {
         name: ""
       }
     };
@@ -69,7 +69,7 @@ export default {
 
   created() {
     this.getCards();
-    this.getLists();
+    this.getColumns();
   },
 
   methods: {
@@ -81,36 +81,36 @@ export default {
       });
     },
 
-    getLists() {
-      axios.get("/slists").then(response => {
-        this.lists = response.data;
+    getColumns() {
+      axios.get("/columns").then(response => {
+        this.columns = response.data;
       });
     },
 
-    fireCreateSlist() {
-      const newList = this.newListData;
-      this.lists.push(newList);
-      this.clearAddListForm();
+    fireCreateColumn() {
+      const newColumn = this.newColData;
+      this.columns.push(newColumn);
+      this.clearAddColForm();
       axios
-        .post("/slists", newList)
+        .post("/columns", newColumn)
         .then(response => {
-          this.getLists();
+          this.getColumns();
         })
         .catch(error => {
-          console.log("error in when creating new list");
+          console.log("error in when creating new column");
         });
-      this.listFormOpen = false;
+      this.colFormOpen = false;
     },
 
     // state management
-    toggleAddCards(listId) {
-      this.listIdforopenAddCard = listId;
+    toggleAddCards(colId) {
+      this.colIdForOpenAddCard = colId;
     },
 
-    toggleListForm() {
-      this.listFormOpen = !this.listFormOpen;
+    toggleColForm() {
+      this.colFormOpen = !this.colFormOpen;
       this.$nextTick(() => {
-        this.$refs.listTitle.focus();
+        this.$refs.colTitle.focus();
       });
     },
 
@@ -119,8 +119,8 @@ export default {
       // this.getCards();
     },
 
-    clearAddListForm() {
-      this.newListData = {
+    clearAddColForm() {
+      this.newColData = {
         name: ""
       };
     },
@@ -131,15 +131,15 @@ export default {
       });
     },
 
-    deleteList(listId) {
-      this.lists = this.lists.filter(list => {
-        return list.id !== listId;
+    deleteColumn(colId) {
+      this.columns = this.columns.filter(col => {
+        return col.id !== colId;
       });
     }
   }
 };
 </script>
 
-<style lang="scss" scss>
+<style lang="scss">
 @import "../../sass/app.scss";
 </style>

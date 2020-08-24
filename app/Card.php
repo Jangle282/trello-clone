@@ -9,11 +9,11 @@ class Card extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'list_order' => 'float',
+        'column_order' => 'float',
     ];
 
-    public function Slist()
+    public function column()
     {
-        $this->belongsTo('Slist');
+        $this->belongsTo('Column');
     }
 }

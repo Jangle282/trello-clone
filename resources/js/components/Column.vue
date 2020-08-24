@@ -1,15 +1,15 @@
 <template>
-  <div class="list">
-    <div class="list-header">
-      <div v-if="editTitleOpen" class="edit-title-open, list-title-container">
-        <input v-model="slist.name" @keyup.enter="saveListTitle" ref="listTitle" />
+  <div class="column">
+    <div class="column-header">
+      <div v-if="editTitleOpen" class="edit-title-open, column-title-container">
+        <input v-model="column.name" @keyup.enter="saveColTitle" ref="colTitle" />
       </div>
 
-      <div v-else @click="openEditTitle" class="list-title-container">
-        <h6>{{slist.name || "add a list"}}</h6>
+      <div v-else @click="openEditTitle" class="column-title-container">
+        <h6>{{column.name || "add a column"}}</h6>
       </div>
 
-      <div class="delete-button" @click="confirmDeleteListMessage">
+      <div class="delete-button" @click="confirmDeleteColMessage">
         <div>X</div>
       </div>
     </div>
@@ -25,7 +25,7 @@
       />
     </div>
 
-    <div v-if="listIdforopenAddCard === slist.id" class="add-card-form">
+    <div v-if="colIdForOpenAddCard === column.id" class="add-card-form">
       <input
         v-model="newCardData.name"
         type="text"
@@ -42,7 +42,7 @@
     <div
       v-else
       class="add-card-form"
-      v-on:click.prevent="$emit('toggleAddCards', slist.id)"
+      v-on:click.prevent="$emit('toggleAddCards', column.id)"
       @click="focusInput"
     >Add a Card</div>
   </div>
@@ -52,41 +52,40 @@
 import Card from "./Card";
 
 export default {
-  name: "List",
+  name: "Column",
   components: { Card },
 
   props: {
-    slist: {
-      name: String,
-      id: Number
-    },
-    listIdforopenAddCard: Number,
-    cards: Array
+      column: {
+          name: String,
+          id: Number
+      },
+      colIdForOpenAddCard: Number,
+      cards: Array
   },
 
   data() {
-    return {
-      filteredCards() {
-        return;
-        [
-          {
-            name: "",
-            id: 0,
-            description: "",
-            _list_id: 0,
-            list_order: 0
-          }
-        ];
-      },
+      return {
+          filteredCards: () => {
+              return [
+                  {
+                      name: "",
+                      id: 0,
+                      description: "",
+                      column_id: 0,
+                      column_order: 0
+                  }
+              ];
+          },
       newCardData: {
-        name: "",
-        _list_id: this.slist.id,
-        description: "",
-        list_order: 1
+              name: "",
+          column_id: this.column.id,
+          description: "",
+          column_order: 1
       },
       editTitleOpen: false,
       cardIsDragged: Number,
-      droppedInSameList: false
+      droppedInSameColumn: false
     };
   },
 
@@ -112,59 +111,54 @@ export default {
     // drag methods
 
     cardDropped(cardDragData) {
-      // event emmitted by the dragzone div received by target list.
-      // adds the dropped card data to the receiving list
-      const nextCardInList =
+      // event emmitted by the dragzone div received by target column.
+      // adds the dropped card data to the receiving column
+      const nextCardInColumn =
         this.filteredCards.find(
-          card => card.list_order > cardDragData.dropZoneListOrder
+          card => card.column_order > cardDragData.dropZoneColOrder
         ) || null;
 
-      const droppedCardNewListOrder =
-        nextCardInList !== null
-          ? cardDragData.dropZoneListOrder +
-            (nextCardInList.list_order - cardDragData.dropZoneListOrder) / 2
-          : cardDragData.dropZoneListOrder + 0.1;
+      const droppedCardNewColOrder =
+        nextCardInColumn !== null
+          ? cardDragData.dropZoneColOrder +
+            (nextCardInColumn.column_order - cardDragData.dropZoneColOrder) / 2
+          : cardDragData.dropZoneColOrder + 0.1;
 
       const droppedCard = {
-        name: cardDragData.draggedCardName,
-        id: cardDragData.draggedCardId,
-        _list_id: this.slist.id,
-        list_order: droppedCardNewListOrder
+          name: cardDragData.draggedCardName,
+          id: cardDragData.draggedCardId,
+          column_id: this.column.id,
+          column_order: droppedCardNewColOrder
       };
 
-      // if card is dropped within the same list, just update it's list order
-      if (this.slist.id === cardDragData.draggedCardListId) {
-        this.droppedInSameList = true;
+      // if card is dropped within the same column, just update it's column order
+      if (this.column.id === cardDragData.draggedCardColId) {
+        this.droppedInSameColumn = true;
         const cardIndex = this.filteredCards.findIndex(
           card => card.id === cardDragData.draggedCardId
         );
-        this.filteredCards[cardIndex].list_order = droppedCardNewListOrder;
+        this.filteredCards[cardIndex].column_order = droppedCardNewColOrder;
         this.filterCards();
       } else {
-        // otherwise splice card into the list in the dropzone
-        // it will be removed from the list of origin via dragend event.
-        const dropZoneListIndex = this.filteredCards.findIndex(
+        // otherwise splice card into the column in the dropzone
+        // it will be removed from the column of origin via dragend event.
+        const dropZoneColIndex = this.filteredCards.findIndex(
           card => card.id === cardDragData.dropZoneCardId
         );
-        this.filteredCards.splice(dropZoneListIndex + 1, 0, droppedCard);
+        this.filteredCards.splice(dropZoneColIndex + 1, 0, droppedCard);
       }
       this.fireUpdateCard(droppedCard);
     },
 
     cardRemovedByDrag(cardData) {
-      // console.log(
-      //   "removed method, list ID, boolean: ",
-      //   this.slist.id,
-      //   this.droppedInSameList
-      // );
-      if (!this.droppedInSameList) {
-        console.log("dropped in dfferent list", this.droppedInSameList);
+      if (!this.droppedInSameColumn) {
+        console.log("dropped in dfferent col", this.droppedInSameColumn);
         const cardIndex = this.filteredCards.findIndex(
           card => card.id === cardData.id
         );
         this.filteredCards.splice(cardIndex, 1);
       } else {
-        this.droppedInSameList = false;
+        this.droppedInSameColumn = false;
       }
     },
 
@@ -172,34 +166,34 @@ export default {
     filterCards() {
       this.filteredCards = this.cards
         .filter(card => {
-          return card._list_id === this.$props.slist.id;
+          return card.column_id === this.$props.column.id;
         })
-        .sort((a, b) => a.list_order - b.list_order);
+        .sort((a, b) => a.column_order - b.column_order);
     },
 
     resetAddCardValues() {
       this.newCardData = {
         name: "",
         description: "",
-        _list_id: this.slist.id
+        column_id: this.column.id
       };
     },
 
     openEditTitle() {
       this.editTitleOpen = true;
-      this.focusInput("listTitle");
+      this.focusInput("colTitle");
     },
 
-    saveListTitle() {
+    saveColTitle() {
       this.editTitleOpen = false;
-      this.fireUpdateSlist();
+      this.fireUpdateColumn();
     },
 
     // AXIOS methods
     submitAddCard() {
       var newCard = this.newCardData;
-      newCard.list_order = this.filteredCards.length
-        ? this.filteredCards[this.filteredCards.length - 1].list_order + 1
+      newCard.column_order = this.filteredCards.length
+        ? this.filteredCards[this.filteredCards.length - 1].column_order + 1
         : 1;
       this.resetAddCardValues();
       this.$emit("newCardCreated", newCard);
@@ -234,24 +228,24 @@ export default {
         });
     },
 
-    fireUpdateSlist() {
-      const listId = this.slist.id;
+    fireUpdateColumn() {
+      const colId = this.column.id;
       axios
-        .put(`/slists/${listId}`, this.slist)
+        .put(`/columns/${colId}`, this.column)
         .then(() => {})
         .catch(err => {
-          console.log("error updating list");
+          console.log("error updating column");
         });
     },
 
-    deleteSlist() {
-      const listId = this.slist.id;
-      this.$emit("listDeleted", listId);
+    deleteColumn() {
+      const colId = this.column.id;
+      this.$emit("colDeleted", colId);
       axios
-        .post(`/slists/${listId}`)
+        .post(`/columns/${colId}`)
         .then(response => {})
         .catch(err => {
-          console.log("error deleting list");
+          console.log("error deleting column");
         });
     },
 
@@ -262,14 +256,14 @@ export default {
       }
     },
 
-    confirmDeleteListMessage() {
+    confirmDeleteColMessage() {
       if (confirm("Are you sure you want to delete this list?")) {
-        this.deleteSlist();
+        this.deleteColumn();
       }
     },
 
     focusInput(ref) {
-      if (ref === "listTitle") {
+      if (ref === "colTitle") {
         this.$nextTick(() => {
           this.$refs[ref].focus();
         });

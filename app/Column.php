@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Slist extends Model
+class Column extends Model
 {
     protected $guarded = [];
 

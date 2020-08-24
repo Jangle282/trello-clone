@@ -43,9 +43,9 @@ class CardController extends Controller
         $card = new Card();
 
         $card->name = request('name');
-        $card->_list_id = request('_list_id');
+        $card->column_id = request('column_id');
         $card->description = request('description');
-        $card->list_order = request('list_order');
+        $card->column_order = request('column_order');
 
         $card->save();
 
@@ -95,8 +95,8 @@ class CardController extends Controller
     public function update(Request $request, $id)
     {
         $card = Card::find($request['id']);
-        $card->_list_id = $request['_list_id'];
-        $card->list_order = $request['list_order'];
+        $card->column_id = $request['column_id'];
+        $card->column_order = $request['column_order'];
         // $card->description = $request['description'];
         $card->save();
 
