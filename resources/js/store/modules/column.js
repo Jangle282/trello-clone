@@ -4,13 +4,13 @@ const state = {
 }
 
 const mutations = {
-    increment (state) {
+    increment(state) {
         state.count++
     }
 }
 
 const getters = {
-    doubleCount (state) {
+    doubleCount(state) {
         return state.count * 2
     }
 }
