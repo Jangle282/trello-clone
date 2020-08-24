@@ -19,8 +19,6 @@ Route::get('/', function () {
 
 Route::post('/cards/{id}', 'CardController@destroy');
 
-Route::put('/cards/{id}', 'CardController@update');
-
 Route::resource('cards', "CardController");
 
 Route::post('/columns/{id}', 'ColumnController@destroy');
