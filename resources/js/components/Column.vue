@@ -2,48 +2,56 @@
     <div class="column">
         <div class="column-header">
             <div v-if="editTitleOpen" class="edit-title-open, column-title-container">
-                <input v-model="column.name" @keyup.enter="saveColTitle" ref="colTitle"/>
+                <input
+                    v-model="column.name"
+                    @keyup.enter="saveColTitle"
+                    ref="colTitle"/>
             </div>
 
-            <div v-else @click="openEditTitle" class="column-title-container">
+            <div
+                v-else
+                @click="openEditTitle"
+                class="column-title-container"
+            >
                 <h6>{{ column.name || "add a column" }}</h6>
             </div>
 
-            <div class="delete-button" @click="confirmDeleteColMessage">
+            <div
+                class="delete-button"
+                @click="deleteColumn"
+            >
                 <div>X</div>
             </div>
         </div>
 
         <div class="cardList">
             <Card
-                v-for="(card) in filteredCards"
+                v-for="card in filteredCards"
                 :key="card.id"
-                v-bind:cardData="card"
-                @cardDeleted="confirmDeleteCardMessage"
+                :cardData="card"
                 @cardDropped="cardDropped"
                 @removedDraggedCard="cardRemovedByDrag"
             />
         </div>
 
-        <div v-if="colIdForOpenAddCard === column.id" class="add-card-form">
+        <div v-if="addCardFormOpen" class="add-card-form">
             <input
                 v-model="newCardData.name"
                 type="text"
                 name="title"
                 id="title"
                 ref="cardTitle"
-                @keyup.enter="submitAddCard"
+                @keyup.enter="storeCard"
             />
-            <div @click="submitAddCard">Add</div>
-            <div @click="$emit('toggleAddCards', null)">X</div>
+            <div @click="storeCard">Add</div>
+            <div @click="toggleAddCardForm">X</div>
             <div>...</div>
         </div>
 
         <div
             v-else
             class="add-card-form"
-            v-on:click.prevent="$emit('toggleAddCards', column.id)"
-            @click="focusInput"
+            @click="toggleAddCardForm"
         >Add a Card
         </div>
     </div>
@@ -51,6 +59,7 @@
 
 <script>
 import Card from "./Card";
+import {mapGetters} from "vuex";
 
 export default {
     name: "Column",
@@ -61,8 +70,6 @@ export default {
             name: String,
             id: Number
         },
-        colIdForOpenAddCard: Number,
-        cards: Array
     },
 
     data() {
@@ -86,8 +93,14 @@ export default {
             },
             editTitleOpen: false,
             cardIsDragged: Number,
-            droppedInSameColumn: false
+            droppedInSameColumn: false,
+            addCardFormOpen: false
         };
+    },
+    computed: {
+        ...mapGetters({
+            cards: 'card/getCards'
+        })
     },
 
     watch: {
@@ -109,10 +122,70 @@ export default {
         //   this.$on("removedDraggedCard", this.cardRemovedByDrag);
         // },
 
-        // drag methods
+        filterCards() {
+            this.filteredCards = this.cards
+                .filter(card => {
+                    return card.column_id === this.$props.column.id;
+                })
+                .sort((a, b) => a.column_order - b.column_order);
+        },
+
+        saveColTitle() {
+            this.editTitleOpen = false;
+            this.updateColumn();
+        },
+
+        updateColumn() {
+            this.$store.dispatch('column/update', this.column)
+        },
+
+        deleteColumn() {
+            if (confirm("Are you sure you want to delete this list?")) {
+                this.$store.dispatch('column/destroy', this.column.id)
+            }
+        },
+
+        openEditTitle() {
+            this.editTitleOpen = true;
+            this.focusInput("colTitle");
+        },
+
+        storeCard() {
+            const newCard = this.newCardData;
+            newCard.column_order = this.filteredCards.length
+                ? this.filteredCards[this.filteredCards.length - 1].column_order + 1
+                : 1;
+            this.$store.dispatch('card/addCard', newCard)
+            this.resetAddCardValues();
+        },
+
+        resetAddCardValues() {
+            this.newCardData = {
+                name: "",
+                description: "",
+                column_id: this.column.id
+            };
+        },
+
+        toggleAddCardForm() {
+            this.addCardFormOpen = !this.addCardFormOpen
+            this.focusInput()
+        },
+
+        focusInput(ref) {
+            if (ref === "colTitle") {
+                this.$nextTick(() => {
+                    this.$refs[ref].focus();
+                });
+            } else {
+                this.$nextTick(() => {
+                    this.$refs.cardTitle.focus();
+                });
+            }
+        },
 
         cardDropped(cardDragData) {
-            // event emmitted by the dragzone div received by target column.
+            // event emmitted by the dragzone div, received by target column.
             // adds the dropped card data to the receiving column
             const nextCardInColumn =
                 this.filteredCards.find(
@@ -129,7 +202,7 @@ export default {
                 name: cardDragData.draggedCardName,
                 id: cardDragData.draggedCardId,
                 column_id: this.column.id,
-                column_order: droppedCardNewColOrder
+                column_order: droppedCardNewColOrder,
             };
 
             // if card is dropped within the same column, just update it's column order
@@ -148,7 +221,7 @@ export default {
                 );
                 this.filteredCards.splice(dropZoneColIndex + 1, 0, droppedCard);
             }
-            this.fireUpdateCard(droppedCard);
+            this.$store.dispatch('card/update', droppedCard)
         },
 
         cardRemovedByDrag(cardData) {
@@ -162,121 +235,6 @@ export default {
                 this.droppedInSameColumn = false;
             }
         },
-
-        // state management
-        filterCards() {
-            this.filteredCards = this.cards
-                .filter(card => {
-                    return card.column_id === this.$props.column.id;
-                })
-                .sort((a, b) => a.column_order - b.column_order);
-        },
-
-        resetAddCardValues() {
-            this.newCardData = {
-                name: "",
-                description: "",
-                column_id: this.column.id
-            };
-        },
-
-        openEditTitle() {
-            this.editTitleOpen = true;
-            this.focusInput("colTitle");
-        },
-
-        saveColTitle() {
-            this.editTitleOpen = false;
-            this.fireUpdateColumn();
-        },
-
-        // AXIOS methods
-        submitAddCard() {
-            var newCard = this.newCardData;
-            newCard.column_order = this.filteredCards.length
-                ? this.filteredCards[this.filteredCards.length - 1].column_order + 1
-                : 1;
-            this.resetAddCardValues();
-            this.$emit("newCardCreated", newCard);
-            axios
-                .post("/cards", newCard)
-                .then(response => {
-                    this.$emit("updateCards");
-                })
-                .catch(error => {
-                    console.log("error submitting add new card form");
-                });
-        },
-
-        fireUpdateCard(cardData) {
-            axios
-                .put(`cards/${cardData.id}`, cardData)
-                .then(response => {
-                    this.$emit("updateCards");
-                })
-                .catch(err => {
-                    console.log(err);
-                });
-        },
-
-        deleteCard(data) {
-            this.$emit("cardDeleted", data);
-            axios
-                .post(`/cards/${data.id}`)
-                .then(() => {
-                })
-                .catch(err => {
-                    console.log("error deleting card");
-                });
-        },
-
-        fireUpdateColumn() {
-            const colId = this.column.id;
-            axios
-                .put(`/columns/${colId}`, this.column)
-                .then(() => {
-                })
-                .catch(err => {
-                    console.log("error updating column");
-                });
-        },
-
-        deleteColumn() {
-            const colId = this.column.id;
-            this.$emit("colDeleted", colId);
-            axios
-                .post(`/columns/${colId}`)
-                .then(response => {
-                })
-                .catch(err => {
-                    console.log("error deleting column");
-                });
-        },
-
-        // alerts and pop ups
-        confirmDeleteCardMessage(data) {
-            if (confirm("Are you sure you want to delete this card?")) {
-                this.deleteCard(data);
-            }
-        },
-
-        confirmDeleteColMessage() {
-            if (confirm("Are you sure you want to delete this list?")) {
-                this.deleteColumn();
-            }
-        },
-
-        focusInput(ref) {
-            if (ref === "colTitle") {
-                this.$nextTick(() => {
-                    this.$refs[ref].focus();
-                });
-            } else {
-                this.$nextTick(() => {
-                    this.$refs.cardTitle.focus();
-                });
-            }
-        }
     }
 };
 </script>

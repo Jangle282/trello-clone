@@ -1,17 +1,49 @@
+import {
+    retrieve,
+    store,
+    destroy,
+    update
+} from '../../api/column'
+
 const state = {
-    count: 1,
-    test: "hello"
+    columns: []
+}
+
+const types = {
+    SET_COLUMNS: 'SET_COLUMNS',
+    ADD_COLUMN: 'ADD_COLUMN',
+    REMOVE_COLUMN: 'REMOVE_COLUMN'
 }
 
 const mutations = {
-    increment(state) {
-        state.count++
+    [types.SET_COLUMNS](state, payload) {
+        state.columns = payload
+    },
+    [types.ADD_COLUMN](state, payload) {
+        state.columns.push(payload)
+    },
+    [types.REMOVE_COLUMN](state, payload) {
+        state.columns = state.columns.filter(col => {
+            return col.id !== payload
+        })
     }
 }
 
 const getters = {
-    doubleCount(state) {
-        return state.count * 2
+    getColumns(state) {
+        return state.columns
+    }
+
+}
+
+const actions = {
+    retrieve,
+    store,
+    destroy,
+    update,
+    addColumn(context, payload) {
+        context.commit('ADD_COLUMN', payload)
+        context.dispatch('store', payload)
     }
 }
 
@@ -19,6 +51,6 @@ export default {
     namespaced: true,
     state,
     mutations,
-    // actions,
+    actions,
     getters,
 };

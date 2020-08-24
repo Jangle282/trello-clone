@@ -4,16 +4,9 @@
         <div class="mainContainer">
             <div class="board">
                 <Column
-                    v-for="column in this.columns"
+                    v-for="column in columns"
                     :key="column.id"
-                    v-bind:cards="cards"
-                    v-bind:colIdForOpenAddCard="colIdForOpenAddCard"
-                    v-bind:column="column"
-                    v-on:toggleAddCards="toggleAddCards"
-                    @newCardCreated="newCard"
-                    @cardDeleted="deleteCard"
-                    @colDeleted="deleteColumn"
-                    @updateCards="getCards"
+                    :column="column"
                 />
 
                 <div class="column">
@@ -24,9 +17,9 @@
                             name="title"
                             id="title"
                             ref="colTitle"
-                            @keyup.enter="fireCreateColumn"
+                            @keyup.enter="storeColumn"
                         />
-                        <div @click="fireCreateColumn">Add</div>
+                        <div @click="storeColumn">Add</div>
                         <div @click="toggleColForm">X</div>
                     </div>
                     <div v-else class="column-header">
@@ -44,6 +37,7 @@
 <script>
 import TopBar from "./TopBar";
 import Column from "./Column";
+import {mapGetters} from 'vuex';
 
 export default {
     name: "Trello",
@@ -55,8 +49,6 @@ export default {
 
     data() {
         return {
-            columns: null,
-            cards: null,
             colIdForOpenAddCard: null,
             colFormOpen: false,
             newColData: {
@@ -64,45 +56,22 @@ export default {
             }
         };
     },
+    computed: {
+        ...mapGetters({
+            cards: 'card/getCards',
+            columns: 'column/getColumns'
+        })
+    },
 
-    created() {
-        this.getCards();
-        this.getColumns();
+    mounted() {
+        this.$store.dispatch('card/retrieve')
+        this.$store.dispatch('column/retrieve')
     },
 
     methods: {
-        // AXIOS methods
-        getCards() {
-            axios.get("/cards").then(response => {
-                this.cards = response.data;
-                console.log("cards updated");
-            });
-        },
-
-        getColumns() {
-            axios.get("/columns").then(response => {
-                this.columns = response.data;
-            });
-        },
-
-        fireCreateColumn() {
-            const newColumn = this.newColData;
-            this.columns.push(newColumn);
+        storeColumn() {
+            this.$store.dispatch('column/addColumn', this.newColData)
             this.clearAddColForm();
-            axios
-                .post("/columns", newColumn)
-                .then(response => {
-                    this.getColumns();
-                })
-                .catch(error => {
-                    console.log("error in when creating new column");
-                });
-            this.colFormOpen = false;
-        },
-
-        // state management
-        toggleAddCards(colId) {
-            this.colIdForOpenAddCard = colId;
         },
 
         toggleColForm() {
@@ -112,28 +81,12 @@ export default {
             });
         },
 
-        newCard(newCardData) {
-            this.cards.push(newCardData);
-            // this.getCards();
-        },
-
         clearAddColForm() {
             this.newColData = {
                 name: ""
             };
         },
 
-        deleteCard(data) {
-            this.cards = this.cards.filter(card => {
-                return card.id !== data.id;
-            });
-        },
-
-        deleteColumn(colId) {
-            this.columns = this.columns.filter(col => {
-                return col.id !== colId;
-            });
-        }
     }
 };
 </script>

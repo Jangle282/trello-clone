@@ -19,8 +19,8 @@
                 <textarea v-model="card.description"/>
             </div>
             <div class="card-edit-btns">
-                <div @click="fireUpdateCard" class>save</div>
-                <div @click="emitDeleteCard" class>delete</div>
+                <div @click="updateCard" class>save</div>
+                <div @click="deleteCard" class>delete</div>
             </div>
         </div>
 
@@ -56,17 +56,13 @@ export default {
 
     mounted() {
         this.setEventListeners();
-        this.setInitialstate();
+        this.card = this.cardData;
     },
 
     methods: {
         setEventListeners() {
             this.$on("draggedCardEnteredDragZone", this.expandDragZoneHeight);
             this.$on("draggedCardLeftDragZone", this.collapseDragZoneHeight);
-        },
-        // state management
-        setInitialstate() {
-            this.card = this.cardData;
         },
 
         toggleOpenCardMenu() {
@@ -81,20 +77,14 @@ export default {
             this.expandDragZone = false;
         },
 
-        // emit CRUD events
-        emitDeleteCard() {
-            this.$emit("cardDeleted", this.card);
+        deleteCard() {
+            if (confirm("Are you sure you want to delete this card?")) {
+                this.$store.dispatch('card/destroy', this.card.id)
+            }
         },
 
-        fireUpdateCard() {
-            axios
-                .put(`cards/${this.card.id}`, this.card)
-                .then(response => {
-                    this.$emit("updateCards");
-                })
-                .catch(err => {
-                    console.log(err);
-                });
+        updateCard() {
+            this.$store.dispatch('card/update', this.card)
         },
 
         // drag methods for dragged card

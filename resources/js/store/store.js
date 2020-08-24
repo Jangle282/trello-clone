@@ -1,15 +1,13 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import column from './modules/column'
+import card from './modules/card'
 
 Vue.use(Vuex);
 
-const store = new Vuex.Store({
+export default new Vuex.Store({
     modules: {
-        column: column
+        column,
+        card
     }
 })
-
-export default {
-    store
-}
