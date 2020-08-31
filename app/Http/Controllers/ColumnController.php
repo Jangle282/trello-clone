@@ -19,16 +19,6 @@ class ColumnController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create(Request $request)
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -43,28 +33,6 @@ class ColumnController extends Controller
         $column->save();
 
         return response($column, Response::HTTP_OK);
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
     }
 
     /**
@@ -93,6 +61,24 @@ class ColumnController extends Controller
     {
         $column = Column::find($id);
         $column->delete();
+        return response(Response::HTTP_OK);
+    }
+
+    /**
+     * Save updated order of columns
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function reorder(Request $request)
+    {
+        $columns = $request['columns'];
+        // return response($columns, Response::HTTP_OK);
+        foreach ($columns as $key => $col) {
+            $column = Column::find($col['id']);
+            $column->column_order = $key;
+            $column->save();
+        }
         return response(Response::HTTP_OK);
     }
 }

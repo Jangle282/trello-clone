@@ -22,7 +22,7 @@ export function store(context, payload) {
 
 export function destroy(context, payload) {
     axios
-        .post(`/cards/${payload}`)
+        .delete(`/cards/${payload}`)
         .then(() => {
             context.commit('REMOVE_CARD', payload)
         })
@@ -42,8 +42,3 @@ export function update(context, payload) {
             console.log("error updating card", err);
         });
 }
-
-
-
-
-

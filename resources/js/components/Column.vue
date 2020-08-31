@@ -1,241 +1,267 @@
 <template>
-    <div class="column">
-        <div class="column-header">
-            <div v-if="editTitleOpen" class="edit-title-open, column-title-container">
-                <input
-                    v-model="column.name"
-                    @keyup.enter="saveColTitle"
-                    ref="colTitle"/>
-            </div>
+  <div>
+    <!-- <div :class=" showDraggedColumnMask ? 'dragged-column-mask' : ''"></div> -->
+    <div
+      :class="['column', {'column-drop-zone' : showColDropZoneStyle}]"
+      draggable="true"
+      @dragstart="colDragStart"
+      @dragend="colDragEnded"
+      @dragenter="colDragEnter"
+      @dragover="colDragOver"
+      @drop="colDragDrop"
+    >
+      <div v-if="!showColDropZoneStyle">
+        <div :class="[ { 'pointer-none' : colDragInProgress},'column-header']">
+          <div v-if="editTitleOpen" class="edit-title-open, column-title-container">
+            <input v-model="column.name" @keyup.enter="saveColTitle" ref="colTitle" />
+          </div>
 
-            <div
-                v-else
-                @click="openEditTitle"
-                class="column-title-container"
-            >
-                <h6>{{ column.name || "add a column" }}</h6>
-            </div>
+          <div v-else @click="openEditTitle" class="column-title-container">
+            <h6>{{ column.name || "add a column" }}</h6>
+          </div>
 
-            <div
-                class="delete-button"
-                @click="deleteColumn"
-            >
-                <div>X</div>
-            </div>
+          <div class="delete-button" @click="deleteColumn">
+            <div>X</div>
+          </div>
         </div>
 
-        <div class="cardList">
-            <Card
-                v-for="card in filteredCards"
-                :key="card.id"
-                :cardData="card"
-                @cardDropped="cardDropped"
-                @removedDraggedCard="cardRemovedByDrag"
-            />
-        </div>
-
-        <div v-if="addCardFormOpen" class="add-card-form">
-            <input
-                v-model="newCardData.name"
-                type="text"
-                name="title"
-                id="title"
-                ref="cardTitle"
-                @keyup.enter="storeCard"
-            />
-            <div @click="storeCard">Add</div>
-            <div @click="toggleAddCardForm">X</div>
-            <div>...</div>
+        <div :class="[ {'pointer-none' : colDragInProgress},'cardList']">
+          <Card
+            v-for="card in filteredCards"
+            :key="card.id"
+            :cardData="card"
+            @cardDropped="cardDropped"
+            @removedDraggedCard="cardRemovedByDrag"
+          />
         </div>
 
         <div
-            v-else
-            class="add-card-form"
-            @click="toggleAddCardForm"
-        >Add a Card
+          v-if="addCardFormOpen"
+          :class="[ {'pointer-none' : colDragInProgress},'add-card-form']"
+        >
+          <input
+            v-model="newCardData.name"
+            type="text"
+            name="title"
+            id="title"
+            ref="cardTitle"
+            @keyup.enter="storeCard"
+          />
+          <div @click="storeCard">Add</div>
+          <div @click="toggleAddCardForm">X</div>
+          <div>...</div>
         </div>
+
+        <div
+          v-else
+          :class="[ {'pointer-none' : colDragInProgress},'add-card-form']"
+          @click="toggleAddCardForm"
+        >Add a Card</div>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>
 import Card from "./Card";
-import {mapGetters} from "vuex";
+import { mapGetters } from "vuex";
 
 export default {
-    name: "Column",
-    components: {Card},
+  name: "Column",
+  components: { Card },
 
-    props: {
-        column: {
-            name: String,
-            id: Number
-        },
+  props: {
+    column: {
+      name: String,
+      id: Number,
+      column_order: Number,
+    },
+  },
+
+  data() {
+    return {
+      filteredCards: () => {
+        return [
+          {
+            name: "",
+            id: 0,
+            description: "",
+            column_id: 0,
+            column_order: 0,
+          },
+        ];
+      },
+      newCardData: {
+        name: "",
+        column_id: this.column.id,
+        description: "",
+        column_order: 1,
+      },
+      editTitleOpen: false,
+      cardIsDragged: Number,
+      droppedInSameColumn: false,
+      addCardFormOpen: false,
+    };
+  },
+  computed: {
+    ...mapGetters({
+      cards: "card/getCards",
+      colDragInProgress: "column/dragStatus",
+      draggedColId: "column/draggedColumnId",
+      targetColId: "column/dragTargetId",
+    }),
+    showColDropZoneStyle() {
+      return (
+        this.colDragInProgress &&
+        this.draggedColId &&
+        this.draggedColId === this.column.id &&
+        this.targetColId
+      );
+    },
+  },
+
+  watch: {
+    cards() {
+      this.filterCards();
+    },
+  },
+
+  created() {
+    if (this.cards) this.filterCards();
+  },
+
+  mounted() {
+    // this.setEventListeners();
+  },
+
+  methods: {
+    colDragStart() {
+      this.$store.dispatch("column/dragStart", this.column);
+    },
+    colDragEnded() {
+      this.$store.dispatch("column/dragEnd", this.column);
+    },
+    colDragEnter(e) {
+      e.preventDefault();
+      this.$store.dispatch("column/dragEnter", this.column);
+    },
+    colDragOver(e) {
+      e.preventDefault();
+    },
+    colDragDrop() {
+      this.$store.dispatch("column/saveColumnOrder");
     },
 
-    data() {
-        return {
-            filteredCards: () => {
-                return [
-                    {
-                        name: "",
-                        id: 0,
-                        description: "",
-                        column_id: 0,
-                        column_order: 0
-                    }
-                ];
-            },
-            newCardData: {
-                name: "",
-                column_id: this.column.id,
-                description: "",
-                column_order: 1
-            },
-            editTitleOpen: false,
-            cardIsDragged: Number,
-            droppedInSameColumn: false,
-            addCardFormOpen: false
-        };
-    },
-    computed: {
-        ...mapGetters({
-            cards: 'card/getCards'
+    filterCards() {
+      this.filteredCards = this.cards
+        .filter((card) => {
+          return card.column_id === this.$props.column.id;
         })
+        .sort((a, b) => a.column_order - b.column_order);
     },
 
-    watch: {
-        cards() {
-            this.filterCards();
-        }
+    saveColTitle() {
+      this.editTitleOpen = false;
+      this.$store.dispatch("column/update", this.column);
     },
 
-    created() {
-        if (this.cards) this.filterCards();
+    deleteColumn() {
+      if (confirm("Are you sure you want to delete this list?")) {
+        this.$store.dispatch("column/destroy", this.column.id);
+      }
     },
 
-    mounted() {
-        // this.setEventListeners();
+    openEditTitle() {
+      this.editTitleOpen = true;
+      this.focusInput("colTitle");
     },
 
-    methods: {
-        // setEventListeners() {
-        //   this.$on("removedDraggedCard", this.cardRemovedByDrag);
-        // },
+    storeCard() {
+      const newCard = this.newCardData;
+      newCard.column_order = this.filteredCards.length
+        ? this.filteredCards[this.filteredCards.length - 1].column_order + 1
+        : 1;
+      this.$store.dispatch("card/addCard", newCard);
+      this.resetAddCardValues();
+    },
 
-        filterCards() {
-            this.filteredCards = this.cards
-                .filter(card => {
-                    return card.column_id === this.$props.column.id;
-                })
-                .sort((a, b) => a.column_order - b.column_order);
-        },
+    resetAddCardValues() {
+      this.newCardData = {
+        name: "",
+        description: "",
+        column_id: this.column.id,
+      };
+    },
 
-        saveColTitle() {
-            this.editTitleOpen = false;
-            this.updateColumn();
-        },
+    toggleAddCardForm() {
+      this.addCardFormOpen = !this.addCardFormOpen;
+      this.focusInput();
+    },
 
-        updateColumn() {
-            this.$store.dispatch('column/update', this.column)
-        },
+    focusInput(ref) {
+      if (ref === "colTitle") {
+        this.$nextTick(() => {
+          this.$refs[ref].focus();
+        });
+      } else {
+        this.$nextTick(() => {
+          this.$refs.cardTitle.focus();
+        });
+      }
+    },
 
-        deleteColumn() {
-            if (confirm("Are you sure you want to delete this list?")) {
-                this.$store.dispatch('column/destroy', this.column.id)
-            }
-        },
+    cardDropped(cardDragData) {
+      // event emmitted by the dragzone div, received by target column.
+      // adds the dropped card data to the receiving column
+      const nextCardInColumn =
+        this.filteredCards.find(
+          (card) => card.column_order > cardDragData.dropZoneColOrder
+        ) || null;
 
-        openEditTitle() {
-            this.editTitleOpen = true;
-            this.focusInput("colTitle");
-        },
+      const droppedCardNewColOrder =
+        nextCardInColumn !== null
+          ? cardDragData.dropZoneColOrder +
+            (nextCardInColumn.column_order - cardDragData.dropZoneColOrder) / 2
+          : cardDragData.dropZoneColOrder + 0.1;
 
-        storeCard() {
-            const newCard = this.newCardData;
-            newCard.column_order = this.filteredCards.length
-                ? this.filteredCards[this.filteredCards.length - 1].column_order + 1
-                : 1;
-            this.$store.dispatch('card/addCard', newCard)
-            this.resetAddCardValues();
-        },
+      const droppedCard = {
+        name: cardDragData.draggedCardName,
+        id: cardDragData.draggedCardId,
+        column_id: this.column.id,
+        column_order: droppedCardNewColOrder,
+      };
 
-        resetAddCardValues() {
-            this.newCardData = {
-                name: "",
-                description: "",
-                column_id: this.column.id
-            };
-        },
+      // if card is dropped within the same column, just update it's column order
+      if (this.column.id === cardDragData.draggedCardColId) {
+        this.droppedInSameColumn = true;
+        const cardIndex = this.filteredCards.findIndex(
+          (card) => card.id === cardDragData.draggedCardId
+        );
+        this.filteredCards[cardIndex].column_order = droppedCardNewColOrder;
+        this.filterCards();
+      } else {
+        // otherwise splice card into the column in the dropzone
+        // it will be removed from the column of origin via dragend event.
+        const dropZoneColIndex = this.filteredCards.findIndex(
+          (card) => card.id === cardDragData.dropZoneCardId
+        );
+        this.filteredCards.splice(dropZoneColIndex + 1, 0, droppedCard);
+      }
+      this.$store.dispatch("card/update", droppedCard);
+    },
 
-        toggleAddCardForm() {
-            this.addCardFormOpen = !this.addCardFormOpen
-            this.focusInput()
-        },
-
-        focusInput(ref) {
-            if (ref === "colTitle") {
-                this.$nextTick(() => {
-                    this.$refs[ref].focus();
-                });
-            } else {
-                this.$nextTick(() => {
-                    this.$refs.cardTitle.focus();
-                });
-            }
-        },
-
-        cardDropped(cardDragData) {
-            // event emmitted by the dragzone div, received by target column.
-            // adds the dropped card data to the receiving column
-            const nextCardInColumn =
-                this.filteredCards.find(
-                    card => card.column_order > cardDragData.dropZoneColOrder
-                ) || null;
-
-            const droppedCardNewColOrder =
-                nextCardInColumn !== null
-                    ? cardDragData.dropZoneColOrder +
-                    (nextCardInColumn.column_order - cardDragData.dropZoneColOrder) / 2
-                    : cardDragData.dropZoneColOrder + 0.1;
-
-            const droppedCard = {
-                name: cardDragData.draggedCardName,
-                id: cardDragData.draggedCardId,
-                column_id: this.column.id,
-                column_order: droppedCardNewColOrder,
-            };
-
-            // if card is dropped within the same column, just update it's column order
-            if (this.column.id === cardDragData.draggedCardColId) {
-                this.droppedInSameColumn = true;
-                const cardIndex = this.filteredCards.findIndex(
-                    card => card.id === cardDragData.draggedCardId
-                );
-                this.filteredCards[cardIndex].column_order = droppedCardNewColOrder;
-                this.filterCards();
-            } else {
-                // otherwise splice card into the column in the dropzone
-                // it will be removed from the column of origin via dragend event.
-                const dropZoneColIndex = this.filteredCards.findIndex(
-                    card => card.id === cardDragData.dropZoneCardId
-                );
-                this.filteredCards.splice(dropZoneColIndex + 1, 0, droppedCard);
-            }
-            this.$store.dispatch('card/update', droppedCard)
-        },
-
-        cardRemovedByDrag(cardData) {
-            if (!this.droppedInSameColumn) {
-                console.log("dropped in dfferent col", this.droppedInSameColumn);
-                const cardIndex = this.filteredCards.findIndex(
-                    card => card.id === cardData.id
-                );
-                this.filteredCards.splice(cardIndex, 1);
-            } else {
-                this.droppedInSameColumn = false;
-            }
-        },
-    }
+    cardRemovedByDrag(cardData) {
+      if (!this.droppedInSameColumn) {
+        console.log("dropped in dfferent col", this.droppedInSameColumn);
+        const cardIndex = this.filteredCards.findIndex(
+          (card) => card.id === cardData.id
+        );
+        this.filteredCards.splice(cardIndex, 1);
+      } else {
+        this.droppedInSameColumn = false;
+      }
+    },
+  },
 };
 </script>
 

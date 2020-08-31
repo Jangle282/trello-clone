@@ -3,6 +3,7 @@ export function retrieve(context) {
         .get("/columns")
         .then(response => {
             context.commit('SET_COLUMNS', response.data)
+            context.commit('ORDER_COLUMNS')
         })
         .catch((err) => {
             console.log('error when retrieving columns', err)
@@ -22,7 +23,7 @@ export function store(context, payload) {
 
 export function destroy(context, payload) {
     axios
-        .post(`/columns/${payload}`)
+        .delete(`/columns/${payload}`)
         .then(response => {
             context.commit('REMOVE_COLUMN', payload)
         })
@@ -42,4 +43,16 @@ export function update(context, payload) {
         });
 }
 
-
+export function saveColumnOrder(context) {
+    context.commit('SET_UPDATE_ORDER_PROGRESS', true)
+    console.log("update Order", context.state.columns)
+    const data = {
+        columns: context.state.columns
+    }
+    axios.post('/columns/order', data).then((response) => {
+        context.commit('SET_UPDATE_ORDER_PROGRESS', false)
+        context.dispatch('retrieve')
+    }).catch((error) => {
+        console.log("error updating column order", error)
+    })
+}

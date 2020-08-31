@@ -14,13 +14,11 @@ use App\Http\Controllers\CardController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('board');
 });
-
-Route::post('/cards/{id}', 'CardController@destroy');
 
 Route::resource('cards', "CardController");
 
-Route::post('/columns/{id}', 'ColumnController@destroy');
+Route::post('/columns/order', 'ColumnController@reorder');
 
 Route::resource('columns', "ColumnController");
