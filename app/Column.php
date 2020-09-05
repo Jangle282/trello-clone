@@ -10,6 +10,6 @@ class Column extends Model
 
     public function cards()
     {
-        return $this->hasMany('Cards');
+        return $this->hasMany('App\Card');
     }
 }

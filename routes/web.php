@@ -17,6 +17,8 @@ Route::get('/', function () {
     return view('board');
 });
 
+Route::post('/cards/order', 'CardController@reorder');
+
 Route::resource('cards', "CardController");
 
 Route::post('/columns/order', 'ColumnController@reorder');

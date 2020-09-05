@@ -15,7 +15,7 @@ class ColumnController extends Controller
      */
     public function index()
     {
-        return response(Column::all()->jsonSerialize(), Response::HTTP_OK);
+        return response(Column::with('cards')->get()->jsonSerialize(), Response::HTTP_OK);
     }
 
     /**
@@ -66,14 +66,13 @@ class ColumnController extends Controller
 
     /**
      * Save updated order of columns
-     * 
+     *
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function reorder(Request $request)
     {
         $columns = $request['columns'];
-        // return response($columns, Response::HTTP_OK);
         foreach ($columns as $key => $col) {
             $column = Column::find($col['id']);
             $column->column_order = $key;

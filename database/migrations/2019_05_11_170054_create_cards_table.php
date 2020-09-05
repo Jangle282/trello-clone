@@ -19,7 +19,7 @@ class CreateCardsTable extends Migration
             $table->string('name');
             $table->text('description')->nullable()->default(null);
             $table->bigInteger('column_id')->unsigned();
-            $table->decimal('column_order', 10, 9);
+            $table->integer('column_order');
             $table->foreign('column_id')->references('id')->on('columns')->onDelete('cascade');
         });
     }

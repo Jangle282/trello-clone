@@ -114,6 +114,24 @@ class CardController extends Controller
     {
         $card = Card::find($id);
         $card->delete();
+        // re-indexcards order
+        return response(Response::HTTP_OK);
+    }
+
+    /**
+     * Save updated order of cards
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function reorder(Request $request)
+    {
+        $cards = $request['cards'];
+        foreach ($cards as $key => $card) {
+            $card = Column::find($card['id']);
+            $card->card_order = $key;
+            $card->save();
+        }
         return response(Response::HTTP_OK);
     }
 }

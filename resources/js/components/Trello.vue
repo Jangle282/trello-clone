@@ -54,13 +54,11 @@ export default {
   },
   computed: {
     ...mapGetters({
-      cards: "card/getCards",
       columns: "column/getColumns",
     }),
   },
 
   mounted() {
-    this.$store.dispatch("card/retrieve");
     this.$store.dispatch("column/retrieve");
   },
 
@@ -89,4 +87,3 @@ export default {
 <style lang="scss">
 @import "../../sass/app.scss";
 </style>
-§

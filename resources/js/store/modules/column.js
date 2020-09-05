@@ -23,7 +23,10 @@ const types = {
     SET_DRAG_TARGET: 'SET_DRAG_TARGET',
     ORDER_COLUMNS: 'ORDER_COLUMNS',
     REORDER_COLUMNS: 'REORDER_COLUMNS',
-    SET_UPDATE_ORDER_PROGRESS: 'SET_UPDATE_ORDER_PROGRESS'
+    SET_UPDATE_ORDER_PROGRESS: 'SET_UPDATE_ORDER_PROGRESS',
+    ADD_CARD: 'ADD_CARD',
+    APPEND_CARD: 'APPEND_CARD',
+    REMOVE_CARD: 'REMOVE_CARD'
 }
 
 const mutations = {
@@ -63,8 +66,32 @@ const mutations = {
     },
     [types.SET_UPDATE_ORDER_PROGRESS](state, payload) {
         state.orderUpdateInProgress = payload
-    }
+    },
+    [types.APPEND_CARD](state, payload) {
+        const columnIndex = state.columns.findIndex((col) => {
+            return col.id === payload.column_id;
+        })
+        state.columns[columnIndex].cards.push(payload)
+    },
+    [types.ADD_CARD](state, ) {
+        const columnIndex = state.columns.findIndex((col) => {
+            return col.id === context.rootState.card.dragTarget.column_id;
+        })
+        const cardIndex = state.columns[columnIndex].cards.findIndex((card) => {
+            return card.id === state.dragTarget.id
+        })
 
+        state.columns[columnIndex].cards.splice(cardIndex + 1, 0, state["card/draggedCard"])
+    },
+    [types.REMOVE_CARD](state, payload) {
+        const columnIndex = state.columns.findIndex((col) => {
+            return col.id === payload.column_id;
+        })
+        const cardIndex = state.columns[columnIndex].cards.findIndex((card) => {
+            return card.id === payload.id
+        })
+        state.columns[columnIndex].cards.splice(cardIndex, 0);
+    }
 }
 
 const getters = {
@@ -99,20 +126,37 @@ const actions = {
         context.commit('CHANGE_DRAG_STATUS', true)
         context.commit('SET_DRAGGED_COLUMN', payload)
     },
+    dragEnter(context, payload) {
+        if (payload.id !== state.draggedColumn.id) {
+            context.commit('SET_DRAG_TARGET', payload)
+            context.commit('REORDER_COLUMNS', false)
+        }
+    },
     dragEnd(context, payload) {
         context.commit('CHANGE_DRAG_STATUS', false)
         context.commit('SET_DRAGGED_COLUMN', null)
         context.commit('SET_DRAG_TARGET', null)
         if (state.orderUpdateInProgress === false) {
             context.commit('ORDER_COLUMNS')
-
         }
     },
-    dragEnter(context, payload) {
-        if (payload.id !== state.draggedColumn.id) {
-            context.commit('SET_DRAG_TARGET', payload)
-            context.commit('REORDER_COLUMNS', false)
+    appendCard(context, payload) {
+        context.commit('APPEND_CARD', payload)
+        context.dispatch('card/store', payload, {root:true})
+    },
+    addCard(context) {
+        context.commit('ADD_CARD')
+    },
+    removeCard(context, payload) {
+        if (!payload) {
+            payload = context.rootState.card.draggedCard
         }
+        context.commit('REMOVE_CARD', payload)
+    },
+
+    destroyCard(context, payload) {
+        context.commit('REMOVE_CARD', payload)
+        context.dispatch('card/destroy', payload.id, {root:true})
     }
 }
 
