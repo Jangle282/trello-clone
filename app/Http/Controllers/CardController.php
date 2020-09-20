@@ -15,7 +15,7 @@ class CardController extends Controller
      */
     public function index()
     {
-        return response(Card::all()->jsonSerialize(), Response::HTTP_OK);
+        //
     }
 
     /**
@@ -25,7 +25,7 @@ class CardController extends Controller
      */
     public function create()
     {
-        // dd("hello from create card function", request());
+        //
     }
 
     /**
@@ -36,10 +36,6 @@ class CardController extends Controller
      */
     public function store(Request $request)
     {
-
-        // return Response::HTTP_OK;
-        // Card::create($request->all());
-
         $card = new Card();
 
         $card->name = request('name');
@@ -49,18 +45,7 @@ class CardController extends Controller
 
         $card->save();
 
-        return Response::HTTP_OK;
-        // return redirect('/');
-
-        // // LONGER BUT MORE EXPLANATORY WAY TO SAVE NEW PREOJCT
-        // // create a new project from eloquent model and save to a variable
-        // $project = new Project();
-        // // save information sent with the request from teh post form tothe new project
-        // $project->title = request('title');
-        // $project->description = request('description');
-        // // save the project to the database
-        // $project->save();
-        // // redirect back to the  projects page
+        return response(Response::HTTP_OK);
     }
 
     /**
@@ -114,7 +99,6 @@ class CardController extends Controller
     {
         $card = Card::find($id);
         $card->delete();
-        // re-indexcards order
         return response(Response::HTTP_OK);
     }
 
@@ -126,11 +110,15 @@ class CardController extends Controller
      */
     public function reorder(Request $request)
     {
-        $cards = $request['cards'];
-        foreach ($cards as $key => $card) {
-            $card = Column::find($card['id']);
-            $card->card_order = $key;
-            $card->save();
+        $cols = $request['data'];
+
+        foreach ($cols as $col) {
+            foreach($col['cards'] as $key => $card) {
+                $card = Card::find($card['id']);
+                $card->column_id = $col['id'];
+                $card->column_order = $key;
+                $card->save();
+            }
         }
         return response(Response::HTTP_OK);
     }

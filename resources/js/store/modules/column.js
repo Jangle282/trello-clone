@@ -3,7 +3,7 @@ import {
     store,
     destroy,
     update,
-    saveColumnOrder
+    saveColumnOrder,
 } from '../../api/column'
 
 const state = {
@@ -24,7 +24,7 @@ const types = {
     ORDER_COLUMNS: 'ORDER_COLUMNS',
     REORDER_COLUMNS: 'REORDER_COLUMNS',
     SET_UPDATE_ORDER_PROGRESS: 'SET_UPDATE_ORDER_PROGRESS',
-    ADD_CARD: 'ADD_CARD',
+    SPLICE_CARD: 'SPLICE_CARD',
     APPEND_CARD: 'APPEND_CARD',
     REMOVE_CARD: 'REMOVE_CARD'
 }
@@ -54,6 +54,11 @@ const mutations = {
         state.columns = state.columns.sort((a, b) => {
             return a.column_order - b.column_order;
         });
+        state.columns.forEach(col => {
+            col.cards.sort((a,b) => {
+                return a.column_order - b.column_order
+            })
+        })
     },
     [types.REORDER_COLUMNS](state) {
         const targetIndex = state.columns.findIndex((col) => {
@@ -73,15 +78,23 @@ const mutations = {
         })
         state.columns[columnIndex].cards.push(payload)
     },
-    [types.ADD_CARD](state, ) {
-        const columnIndex = state.columns.findIndex((col) => {
-            return col.id === context.rootState.card.dragTarget.column_id;
+    [types.SPLICE_CARD](state, payload) {
+        const draggedColumnIndex = state.columns.findIndex((col) => {
+            return col.id === payload.dragged.column_id;
         })
-        const cardIndex = state.columns[columnIndex].cards.findIndex((card) => {
-            return card.id === state.dragTarget.id
+        const draggedCardIndex = state.columns[draggedColumnIndex].cards.findIndex((card) => {
+            return card.id === payload.dragged.id
+        })
+        const targetColumnIndex = state.columns.findIndex((col) => {
+            return col.id === payload.target.column_id;
+        })
+        const targetCardIndex = state.columns[targetColumnIndex].cards.findIndex((card) => {
+            return card.id === payload.target.id
         })
 
-        state.columns[columnIndex].cards.splice(cardIndex + 1, 0, state["card/draggedCard"])
+        state.columns[draggedColumnIndex].cards.splice(draggedCardIndex, 1);
+
+        state.columns[targetColumnIndex].cards.splice(targetCardIndex+1, 0, payload.dragged)
     },
     [types.REMOVE_CARD](state, payload) {
         const columnIndex = state.columns.findIndex((col) => {
@@ -90,7 +103,7 @@ const mutations = {
         const cardIndex = state.columns[columnIndex].cards.findIndex((card) => {
             return card.id === payload.id
         })
-        state.columns[columnIndex].cards.splice(cardIndex, 0);
+        state.columns[columnIndex].cards.splice(cardIndex, 1);
     }
 }
 
@@ -132,7 +145,7 @@ const actions = {
             context.commit('REORDER_COLUMNS', false)
         }
     },
-    dragEnd(context, payload) {
+    dragEnd(context) {
         context.commit('CHANGE_DRAG_STATUS', false)
         context.commit('SET_DRAGGED_COLUMN', null)
         context.commit('SET_DRAG_TARGET', null)
@@ -144,16 +157,9 @@ const actions = {
         context.commit('APPEND_CARD', payload)
         context.dispatch('card/store', payload, {root:true})
     },
-    addCard(context) {
-        context.commit('ADD_CARD')
+    spliceCard(context, payload) {
+        context.commit('SPLICE_CARD', payload)
     },
-    removeCard(context, payload) {
-        if (!payload) {
-            payload = context.rootState.card.draggedCard
-        }
-        context.commit('REMOVE_CARD', payload)
-    },
-
     destroyCard(context, payload) {
         context.commit('REMOVE_CARD', payload)
         context.dispatch('card/destroy', payload.id, {root:true})

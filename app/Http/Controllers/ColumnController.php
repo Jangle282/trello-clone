@@ -28,7 +28,8 @@ class ColumnController extends Controller
     {
         $column = new Column();
 
-        $column->name = request('name');
+        $column->name = $request['name'];
+        $column->column_order = $request['column_order'];
 
         $column->save();
 

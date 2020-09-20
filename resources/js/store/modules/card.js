@@ -2,16 +2,15 @@ import {
     store,
     destroy,
     update,
-    saveCardOrder
-} from '../../api/card'
+    storeNewCardOrder
+} from '../../api/card';
 
 const types = {
     CHANGE_DRAG_STATUS: 'CHANGE_DRAG_STATUS',
     SET_DRAGGED_CARD: 'SET_DRAGGED_CARD',
     SET_DRAG_TARGET: 'SET_DRAG_TARGET',
-    ORDER_CARDS: 'ORDER_CARDS',
-    REORDER_CARDS: 'REORDER_CARDS',
-    SET_UPDATE_ORDER_PROGRESS: 'SET_UPDATE_ORDER_PROGRESS'
+    SET_UPDATE_ORDER_PROGRESS: 'SET_UPDATE_ORDER_PROGRESS',
+    CHANGE_DRAG_OVER_STATUS: 'CHANGE_DRAG_OVER_STATUS'
 }
 
 
@@ -19,7 +18,8 @@ const state = {
     dragStatus: false,
     draggedCard: null,
     dragTarget: null,
-    orderUpdateInProgress: false
+    orderUpdateInProgress: false,
+    dragOverStatus: false
 }
 
 const mutations = {
@@ -32,22 +32,11 @@ const mutations = {
     [types.SET_DRAG_TARGET](state, payload) {
         state.dragTarget = payload
     },
-    [types.ORDER_CARDS](state) {
-        // state.columns = state.columns.sort((a, b) => {
-        //     return a.column_order - b.column_order;
-        // });
-    },
-    [types.REORDER_CARDS](state) {
-        // const targetIndex = state.columns.findIndex((col) => {
-        //     return col.id === state.dragTarget.id
-        // })
-        // const draggedIndex = state.columns.findIndex((col) => {
-        //     return col.id === state.draggedColumn.id
-        // })
-        // state.columns.splice(targetIndex, 0, state.columns.splice(draggedIndex, 1)[0])
-    },
     [types.SET_UPDATE_ORDER_PROGRESS](state, payload) {
         state.orderUpdateInProgress = payload
+    },
+    [types.CHANGE_DRAG_OVER_STATUS](state, payload) {
+        state.dragOverStatus = payload
     }
 }
 
@@ -63,6 +52,9 @@ const getters = {
     },
     dragTargetId() {
         return state.dragTarget ? state.dragTarget.id : null
+    },
+    dragOverStatus() {
+        return state.dragOverStatus
     }
 }
 
@@ -70,25 +62,34 @@ const actions = {
     store,
     destroy,
     update,
-    dropCard(context) {
-        // reorder cards in vuex - splice it out of one and into another.
-
-        // dispatch backend changes for affected columns
-
-
-        // if one of the backend changes is already in prcess. cancel and put it back where it came from.
-    },
+    storeNewCardOrder,
     dragStart(context, payload) {
         context.commit('CHANGE_DRAG_STATUS', true)
         context.commit('SET_DRAGGED_CARD', payload)
     },
     dragEnter(context, payload) {
-        if (payload.id !== state.draggedCard.id) {
-            context.commit('SET_DRAG_TARGET', payload)
-        }
+        context.commit('CHANGE_DRAG_OVER_STATUS', true)
+        context.commit('SET_DRAG_TARGET', payload)
+    },
+    dragLeave(context) {
+        context.commit('CHANGE_DRAG_OVER_STATUS', false)
+        context.commit('SET_DRAG_TARGET', null)
+    },
+    dragDrop(context) {
+        const dragTarget = state.dragTarget;
+        const draggedCard = state.draggedCard;
+        context.dispatch('column/spliceCard', {target: dragTarget, dragged: draggedCard}, {root:true})
+        const draggedColumnIndex = context.rootState.column.columns.findIndex((col) => {
+            return col.id === draggedCard.column_id;
+        })
+        const targetColumnIndex = context.rootState.column.columns.findIndex((col) => {
+            return col.id === dragTarget.column_id;
+        })
+        context.dispatch('storeNewCardOrder', [draggedColumnIndex, targetColumnIndex])
     },
     dragEnd(context) {
         context.commit('CHANGE_DRAG_STATUS', false)
+        context.commit('CHANGE_DRAG_OVER_STATUS', false)
         context.commit('SET_DRAGGED_CARD', null)
         context.commit('SET_DRAG_TARGET', null)
     },

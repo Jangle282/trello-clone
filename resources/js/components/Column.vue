@@ -143,8 +143,10 @@ export default {
     },
 
     saveColTitle() {
-      this.editTitleOpen = false;
-      this.$store.dispatch("column/update", this.column);
+        if (this.column.name.length > 0) {
+            this.$store.dispatch("column/update", this.column);
+            this.editTitleOpen = false;
+        }
     },
 
     deleteColumn() {
@@ -159,10 +161,12 @@ export default {
     },
 
     storeCard() {
-      const newCard = this.newCardData;
-      newCard.column_order = this.column.cards.length
-      this.$store.dispatch("column/addCard", newCard);
-      this.resetAddCardValues();
+        if (this.newCardData.name.length > 0) {
+            const newCard = this.newCardData;
+            newCard.column_order = this.column.cards ? this.column.cards.length : 0
+            this.$store.dispatch("column/appendCard", newCard);
+            this.resetAddCardValues();
+        }
     },
 
     resetAddCardValues() {
@@ -188,59 +192,7 @@ export default {
           this.$refs.cardTitle.focus();
         });
       }
-    },
-
-    cardDropped(cardDragData) {
-      // event emmitted by the dragzone div, received by target column.
-      // adds the dropped card data to the receiving column
-      // const nextCardInColumn =
-      //   this.filteredCards.find(
-      //     (card) => card.column_order > cardDragData.dropZoneColOrder
-      //   ) || null;
-      //
-      // const droppedCardNewColOrder =
-      //   nextCardInColumn !== null
-      //     ? cardDragData.dropZoneColOrder +
-      //       (nextCardInColumn.column_order - cardDragData.dropZoneColOrder) / 2
-      //     : cardDragData.dropZoneColOrder + 0.1;
-      //
-      // const droppedCard = {
-      //   name: cardDragData.draggedCardName,
-      //   id: cardDragData.draggedCardId,
-      //   column_id: this.column.id,
-      //   column_order: droppedCardNewColOrder,
-      // };
-      //
-      // // if card is dropped within the same column, just update it's column order
-      // if (this.column.id === cardDragData.draggedCardColId) {
-      //   this.droppedInSameColumn = true;
-      //   const cardIndex = this.filteredCards.findIndex(
-      //     (card) => card.id === cardDragData.draggedCardId
-      //   );
-      //   this.filteredCards[cardIndex].column_order = droppedCardNewColOrder;
-      //   this.filterCards();
-      // } else {
-      //   // otherwise splice card into the column in the dropzone
-      //   // it will be removed from the column of origin via dragend event.
-      //   const dropZoneColIndex = this.filteredCards.findIndex(
-      //     (card) => card.id === cardDragData.dropZoneCardId
-      //   );
-      //   this.filteredCards.splice(dropZoneColIndex + 1, 0, droppedCard);
-      // }
-      // this.$store.dispatch("card/update", droppedCard);
-    },
-
-    cardRemovedByDrag(cardData) {
-      // if (!this.droppedInSameColumn) {
-      //   console.log("dropped in dfferent col", this.droppedInSameColumn);
-      //   const cardIndex = this.filteredCards.findIndex(
-      //     (card) => card.id === cardData.id
-      //   );
-      //   this.filteredCards.splice(cardIndex, 1);
-      // } else {
-      //   this.droppedInSameColumn = false;
-      // }
-    },
+    }
   },
 };
 </script>
@@ -248,5 +200,3 @@ export default {
 
 <style>
 </style>
-
-

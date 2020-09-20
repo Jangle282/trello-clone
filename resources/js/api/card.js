@@ -1,13 +1,3 @@
-export function retrieve(context) {
-    axios
-        .get("/cards")
-        .then(response => {
-        })
-        .catch(error => {
-            console.log("error retrieving cards", error);
-        });
-}
-
 export function store(context, payload) {
     axios
         .post("/cards", payload)
@@ -31,7 +21,6 @@ export function destroy(context, payload) {
 }
 
 export function update(context, payload) {
-    console.log("payloud", payload)
     axios
         .put(`cards/${payload.id}`, payload)
         .then(response => {
@@ -42,18 +31,14 @@ export function update(context, payload) {
         });
 }
 
-export function saveCardOrder(context, payload) {
-    // send a set of cards and a column id to reorder a column
-    // context.commit('SET_UPDATE_ORDER_PROGRESS', true)
-    // const data = {
-    //     columns: context.state.columns[].cards
-    // }
-    // axios.post('/columns/order', data).then((response) => {
-    //     context.commit('SET_UPDATE_ORDER_PROGRESS', false)
-    //     context.dispatch('retrieve')
-    // }).catch((error) => {
-    //     console.log("error updating column order", error)
-    // })
+export function storeNewCardOrder(context, payload) {
+    let data = [];
+    payload.forEach(colId => {
+        data.push(context.rootState.column.columns[colId]);
+    })
+    axios.post('/cards/reorder', {data}).then((response) => {
+        console.log("response", response)
+    }).catch((error) => {
+        console.log("error updating card order", error)
+    })
 }
-
-

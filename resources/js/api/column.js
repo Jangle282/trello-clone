@@ -45,7 +45,6 @@ export function update(context, payload) {
 
 export function saveColumnOrder(context) {
     context.commit('SET_UPDATE_ORDER_PROGRESS', true)
-    console.log("update Order", context.state.columns)
     const data = {
         columns: context.state.columns
     }
