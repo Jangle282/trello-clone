@@ -10,7 +10,11 @@
 body {
     display: flex;
     width: 100vw;
-    height: 100vh
+    height: 100vh;
+    font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Noto Sans,Ubuntu,Droid Sans,Helvetica Neue,sans-serif;
+    color: rgba(23,43,77);
+    font-size: 14px;
+    font-weight: 400;
 }
 
 #app {
@@ -20,7 +24,15 @@ body {
 }
 
 .pageContainer {
-    width: 100%
+    width: 100%;
+    background-image: url(https://trello-backgrounds.s3.amazonaws.com/SharedBackground/1280x1920/0a5c19cea1f4ece90061dec6c83b3618/photo-1597949449770-76dffc9dc9fe.jpg);
+    background-position-y: 50%;
+    background-size: cover;
+    overflow-x: auto;
+}
+
+.no-scroll {
+    overflow-x: hidden;
 }
 
 .mainContainer {
@@ -33,12 +45,13 @@ body {
 
 .topbar {
     padding: 10px 20px 10px;
-    background-color: #398874;
-    color: #303030
+    background-color: rgba(0,0,0,.32);
+    color: white;
 }
 
 .topbar h4 {
     margin: 0 0;
+    color: white
 }
 
 .board {
@@ -46,7 +59,6 @@ body {
     flex-flow: row nowrap;
     justify-content: flex-start;
     align-items: flex-start;
-    background-color: #44a28b;
     overflow-x: auto;
     height: 100%;
     padding: 10px;
@@ -61,8 +73,6 @@ body {
     padding: 4px 0 5px;
     border-radius: 2px;
     background-color: #dcdcdc;
-    // overflow-y: auto;
-    // max-height: 85vh;
 }
 
 .column-drop-zone {
@@ -125,7 +135,7 @@ body {
             background-color: lightgray;
             display: inline-block;
             text-align: center;
-            margin: 4px 0;
+            //margin: 4px 0;
             border-radius: 2px;
             width: 8%;
             cursor: pointer;
@@ -140,7 +150,7 @@ body {
 .task-card {
     color: rgb(48, 48, 48);
     width: 100%;
-    padding: 0 4px 0 8px;
+    padding: 6px 8px 2px;
     background-color: #f6f6f6;
     border-radius: 2px;
     box-shadow: 0 1px 0 rgba(9, 30, 66, .25);
@@ -165,28 +175,61 @@ body {
 
 }
 
-.open-card-menu-overlay {
-    border: 1px solid black;
+.card-detail-overlay {
     background-color: rgba(9, 30, 66, .25);
-    // these things make a full screen overlay
-    // within that overlay
-    width: 100vw;
-    height: 100vh;
-    position: absolute;
-    top: 0;
-    right: 0;
-}
-
-.card-detail-container {
-    background-color: #f6f6f6;
-    position: relative;
-    top: -23px;
-    width: 100%;
-    z-index: 1;
     display: flex;
     flex-flow: column nowrap;
+    justify-content: center;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    right: 0;
+    padding: 20px
 }
 
+.edit-card {
+    background-color: #f2f2f2;
+    margin: 0 auto;
+    padding: 20px;
+    width: 100%;
+    max-width: 400px;
+    border-radius: 2px;
+}
+
+.card-edit-title {
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+    padding-bottom: 15px;
+    input {
+        outline: none;
+        box-shadow: inset 0 0 0 2px #0079bf;
+        border: none;
+        background-color: white;
+    }
+}
+
+.card-edit-description {
+    cursor: pointer;
+    textarea {
+        outline: none;
+        border: none;
+        border-radius: 2px;
+        background-color: white;
+        resize: none;
+        padding: 10px;
+        width: 100%;
+        &:focus {
+            box-shadow: inset 0 0 0 2px #0079bf;
+        }
+    }
+}
+
+.dragged-placeholder {
+    background-color: rgb(48, 48, 48);
+    color: #f6f6f6;
+}
 
 
 .dragged-card {

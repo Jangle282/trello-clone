@@ -10,7 +10,9 @@ const types = {
     SET_DRAGGED_CARD: 'SET_DRAGGED_CARD',
     SET_DRAG_TARGET: 'SET_DRAG_TARGET',
     SET_UPDATE_ORDER_PROGRESS: 'SET_UPDATE_ORDER_PROGRESS',
-    CHANGE_DRAG_OVER_STATUS: 'CHANGE_DRAG_OVER_STATUS'
+    CHANGE_DRAG_OVER_STATUS: 'CHANGE_DRAG_OVER_STATUS',
+    OPEN_EDIT_OVERLAY: 'OPEN_EDIT_OVERLAY',
+    CLOSE_EDIT_OVERLAY: 'CLOSE_EDIT_OVERLAY'
 }
 
 
@@ -19,7 +21,9 @@ const state = {
     draggedCard: null,
     dragTarget: null,
     orderUpdateInProgress: false,
-    dragOverStatus: false
+    dragOverStatus: false,
+    openEditOverlay: false,
+    editedCard: null
 }
 
 const mutations = {
@@ -37,6 +41,14 @@ const mutations = {
     },
     [types.CHANGE_DRAG_OVER_STATUS](state, payload) {
         state.dragOverStatus = payload
+    },
+    [types.OPEN_EDIT_OVERLAY](state, payload) {
+        state.openEditOverlay = true,
+        state.editedCard = payload
+    },
+    [types.CLOSE_EDIT_OVERLAY](state) {
+        state.openEditOverlay = false
+        state.editedCard = null
     }
 }
 
@@ -55,6 +67,12 @@ const getters = {
     },
     dragOverStatus() {
         return state.dragOverStatus
+    },
+    cardEditOverlayStatus() {
+        return state.openEditOverlay
+    },
+    editedCard() {
+        return state.editedCard
     }
 }
 
@@ -93,6 +111,12 @@ const actions = {
         context.commit('SET_DRAGGED_CARD', null)
         context.commit('SET_DRAG_TARGET', null)
     },
+    openEditCardOverlay(context, payload) {
+        context.commit('OPEN_EDIT_OVERLAY', payload)
+    },
+    closeEditCardOverlay(context) {
+        context.commit('CLOSE_EDIT_OVERLAY')
+    }
 }
 
 export default {

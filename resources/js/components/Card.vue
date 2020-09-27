@@ -9,23 +9,10 @@
         >
             <p class="card-name">{{ card.name }}</p>
 
-            <div class="ellipses" @click="toggleOpenCardMenu">
+            <div class="ellipses" @click="openEditCardOverlay">
                 <div class="dots">...</div>
             </div>
         </div>
-
-        <div v-if="openCardMenu" class="card-detail-container task-card">
-            <div class="card-edit-inputs">
-                <input v-model="card.name"/>
-                <textarea v-model="card.description"/>
-            </div>
-            <div class="card-edit-btns">
-                <div @click="updateCard" class>save</div>
-                <div @click="deleteCard" class>delete</div>
-            </div>
-        </div>
-
-        <div v-if="openCardMenu" @click="toggleOpenCardMenu" class="open-card-menu-overlay"></div>
 
         <div
             :class="[{ 'expand-drag-zone' : (dragTargetId === card.id && cardIsOverTarget)}, 'drag-zone' ]"
@@ -51,7 +38,6 @@ export default {
                 type: Object,
                 required: false,
             },
-            openCardMenu: false,
         };
     },
     computed: {
@@ -60,6 +46,7 @@ export default {
             cardIsOverTarget: 'card/dragOverStatus',
             draggedCardId: 'card/draggedCardId',
             dragTargetId: 'card/dragTargetId',
+            cardEditOverlayStatus: "card/cardEditOverlayStatus",
         })
     },
 
@@ -68,18 +55,10 @@ export default {
     },
 
     methods: {
-        toggleOpenCardMenu() {
-            this.openCardMenu = !this.openCardMenu;
-        },
-
-        deleteCard() {
-            if (confirm("Are you sure you want to delete this card?")) {
-                this.$store.dispatch("column/destroyCard", this.card);
+        openEditCardOverlay() {
+            if (!this.cardEditOverlayStatus) {
+                this.$store.dispatch("card/openEditCardOverlay", {...this.card});
             }
-        },
-
-        updateCard() {
-            this.$store.dispatch("card/update", this.card);
         },
 
         cardDragStart() {

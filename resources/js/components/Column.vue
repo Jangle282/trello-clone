@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- <div :class=" showDraggedColumnMask ? 'dragged-column-mask' : ''"></div> -->
     <div
       :class="['column', {'column-drop-zone' : showColDropZoneStyle}]"
       draggable="true"
@@ -31,8 +30,6 @@
             v-for="card in column.cards"
             :key="card.id"
             :cardData="card"
-            @cardDropped="cardDropped"
-            @removedDraggedCard="cardRemovedByDrag"
           />
         </div>
 

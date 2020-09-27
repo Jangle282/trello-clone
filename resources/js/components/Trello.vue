@@ -1,5 +1,5 @@
 <template>
-    <div class="pageContainer">
+    <div :class="[{'no-scroll' : cardEditOverlayStatus },'pageContainer']">
         <TopBar/>
         <div class="mainContainer">
             <div class="board">
@@ -23,6 +23,23 @@
                             <h6>Add a Column</h6>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div v-if="cardEditOverlayStatus" class="card-detail-overlay" @click="closeEditCardOverlay">
+            <div class="edit-card" @keyup.enter="updateCard" @click.stop="closeEditTitle">
+                <div class="card-edit-title" @click.stop="openEditCardTitle">
+                    <h6 v-if="!editCardTitle" >{{editedCard.name}}</h6>
+                    <input v-if="editCardTitle" :placeholder="editedCard.name" v-model="editedCard.name" @keyup.enter="editCardTitle = false"/>
+                    <span class="" @click="closeEditCardOverlay">X</span>
+                </div>
+                <div class="card-edit-description">
+                    <h6>Description</h6>
+                    <textarea v-model="editedCard.description" placeholder="Give a more detailed description..."/>
+                </div>
+                <div class="card-edit-btns">
+                    <div @click="updateCard" class>save</div>
+                    <div @click="deleteCard" class>delete</div>
                 </div>
             </div>
         </div>
@@ -50,11 +67,15 @@ export default {
             newColData: {
                 name: "",
             },
+            editCardTitle: false,
+            editedCardPlaceholder: ""
         };
     },
     computed: {
         ...mapGetters({
             columns: "column/getColumns",
+            cardEditOverlayStatus: "card/cardEditOverlayStatus",
+            editedCard:'card/editedCard'
         }),
     },
 
@@ -63,6 +84,32 @@ export default {
     },
 
     methods: {
+        openEditCardTitle() {
+            this.editCardTitle = true
+        },
+
+        closeEditTitle() {
+          if (this.editCardTitle) {
+              this.editCardTitle = false
+          }
+        },
+
+        closeEditCardOverlay() {
+            if (this.cardEditOverlayStatus) {
+                this.$store.dispatch("card/closeEditCardOverlay");
+            }
+        },
+
+        deleteCard() {
+            if (confirm("Are you sure you want to delete this card?")) {
+                this.$store.dispatch("column/destroyCard", this.editedCard);
+            }
+        },
+
+        updateCard() {
+            this.$store.dispatch("card/update", this.editedCard);
+        },
+
         storeColumn() {
             const colData = {
                 name: this.newColData.name,
