@@ -26,20 +26,29 @@
                 </div>
             </div>
         </div>
-        <div v-if="cardEditOverlayStatus" class="card-detail-overlay" @click="closeEditCardOverlay">
+        <div v-if="cardEditOverlayStatus" class="card-detail-overlay" @click.stop="closeEditCardOverlay">
             <div class="edit-card" @keyup.enter="updateCard" @click.stop="closeEditTitle">
-                <div class="card-edit-title" @click.stop="openEditCardTitle">
-                    <h6 v-if="!editCardTitle" >{{editedCard.name}}</h6>
-                    <input v-if="editCardTitle" :placeholder="editedCard.name" v-model="editedCard.name" @keyup.enter="editCardTitle = false"/>
+                <div class="card-edit-title">
+                    <h6 v-if="!editCardTitle" @click.stop="openEditCardTitle">{{editedCard.name}}"</h6>
+                    <input
+                        v-if="editCardTitle"
+                        :placeholder="editedCard.name"
+                        v-model="editedCard.name"
+                        @keyup.enter="editCardTitle = false"
+                    />
                     <span class="" @click="closeEditCardOverlay">X</span>
                 </div>
+
                 <div class="card-edit-description">
                     <h6>Description</h6>
-                    <textarea v-model="editedCard.description" placeholder="Give a more detailed description..."/>
+                    <textarea
+                        v-model="editedCard.description"
+                        placeholder="Give a more detailed description..."
+                    />
                 </div>
-                <div class="card-edit-btns">
-                    <div @click="updateCard" class>save</div>
-                    <div @click="deleteCard" class>delete</div>
+                <div class="card-edit-buttons">
+                    <div @click="updateCard" class="btn save-btn">Save</div>
+                    <div @click="deleteCard" class="btn delete-btn">Delete</div>
                 </div>
             </div>
         </div>
@@ -68,7 +77,7 @@ export default {
                 name: "",
             },
             editCardTitle: false,
-            editedCardPlaceholder: ""
+            editedCardPlaceholder: "",
         };
     },
     computed: {
@@ -78,7 +87,6 @@ export default {
             editedCard:'card/editedCard'
         }),
     },
-
     mounted() {
         this.$store.dispatch("column/retrieve");
     },

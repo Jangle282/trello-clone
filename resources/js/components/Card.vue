@@ -6,6 +6,7 @@
             @dragend="cardDragEnded"
             :class="[{'dragged-card' : (draggedCardId === this.card.id)}, 'task-card']"
             id="task-card"
+            @click="openEditCardOverlay"
         >
             <p class="card-name">{{ card.name }}</p>
 
